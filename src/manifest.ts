@@ -21,6 +21,9 @@ export default defineManifest({
     service_worker: 'src/background/index.ts',
     type: 'module',
   },
+  host_permissions: [
+    "https://video-summarizer-gateway-6rjhapzj.uc.gateway.dev/"
+  ],
   web_accessible_resources: [
     {
       resources: ['img/16x16.png', 'img/32x32.png', 'img/64x64.png', 'img/128x128.png', 'img/256x256.png'],
@@ -29,6 +32,7 @@ export default defineManifest({
   ],
   permissions: [
     "storage",
+    "tabs",
     "activeTab"
   ],
 })
