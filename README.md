@@ -2,7 +2,9 @@
 
 A chrome extension for generating YouTube summaries in note form using OpenAI.
 
-![logo](img/logo.svg | =500x500)
+<img src="img/logo.svg" alt="alt text" width="100%" height="128">
+
+---
 
 ## Installing
 
