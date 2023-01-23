@@ -19,7 +19,8 @@ async function getSummary(token: string, videoURL: string): Promise<Summary> {
     `${API_GATEWAY_URL}/v1/youtube/summarizeVideoWithToken?videoURL=${videoURL}`,
     {
       headers: {
-        "openai-token": token
+        "openai-token": token,
+        "yt-summarized-request-source": "BROWSER_EXTENSION"
       }
     }
   )
@@ -109,18 +110,18 @@ function App() {
             !openAIToken ? (
               <VStack>
                 <a onClick={() => chrome.runtime.openOptionsPage()}>
-                  <Button leftIcon={<SettingsIcon />}>
-                    Enter your OpenAI token in the settings
+                  <Button leftIcon={<SettingsIcon />} rightIcon={<ExternalLinkIcon />}>
+                    Start using the extension by entering an OpenAI key in the settings
                   </Button>
                 </a>
-                <HStack>
-                  <a href="https://beta.openai.com/account/api-keys" target={"_blank"}>
-                    Create a new OpenAPI token
-                  </a>
-                  <ExternalLinkIcon />
-                </HStack>
               </VStack>
             ) : <>
+              <HStack>
+                <a href="https://beta.openai.com/account/api-keys" target={"_blank"}>
+                  Manage OpenAI API keys
+                </a>
+                <ExternalLinkIcon />
+              </HStack>
               <Tooltip label={videoURL ? `Summarize ${videoURL}` : "Go to YouTube.com to summarize videos"}>
                 <Button
                   isDisabled={!videoURL}

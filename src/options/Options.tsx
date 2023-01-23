@@ -1,5 +1,5 @@
 import { ExternalLinkIcon, QuestionIcon } from '@chakra-ui/icons'
-import { Container, Heading, HStack, Input, Tooltip, VStack } from '@chakra-ui/react'
+import { Container, FormControl, FormErrorMessage, FormHelperText, FormLabel, Heading, HStack, Input, Text, Tooltip, VStack } from '@chakra-ui/react'
 import { useEffect, useState } from 'react'
 import { getToken, storeToken } from '../background'
 
@@ -14,6 +14,8 @@ function App() {
       })
   }, [])
 
+  const invalidApiKey = Boolean(!openAIToken?.startsWith("sk-") || openAIToken?.length !== 51)
+
   return (
     <main>
       <Container >
@@ -21,30 +23,45 @@ function App() {
           <Heading>YouTube Summarized</Heading>
           <VStack>
 
-            <HStack>
-
-              <Heading size={'sm'}>OpenAI API token</Heading>
-              <Tooltip label="Enter your OpenAI API token below to use the extension">
-                <QuestionIcon />
-              </Tooltip>
-            </HStack>
-            <Input
-              textAlign={'center'}
-              w="35em"
-              placeholder='Enter OpenAI token'
-              defaultValue={openAIToken}
-              onChange={
-                c => {
-                  const newToken = c.target.value
-                  storeToken(newToken)
-                  setOpenAIToken(newToken)
+            <FormControl>
+              <FormLabel>
+                <HStack>
+                  <Heading size={'sm'}>OpenAI API key</Heading>
+                  <Tooltip label="Enter your OpenAI API key below to use the extension.">
+                    <QuestionIcon />
+                  </Tooltip>
+                </HStack>
+              </FormLabel>
+              <Input
+                textAlign={'center'}
+                w="35em"
+                placeholder='Enter OpenAI API key'
+                defaultValue={openAIToken}
+                onChange={
+                  c => {
+                    const newToken = c.target.value
+                    storeToken(newToken)
+                    setOpenAIToken(newToken)
+                  }
                 }
+              />
+              {
+                invalidApiKey && (
+                  <FormErrorMessage>
+                    Invalid OpenAI API key format. Did you enter the correct API key?
+                  </FormErrorMessage>
+                )
               }
-            />
+              <FormHelperText>
+                <Text>
+                  The API Key will be used when you generate summaries, which will expend OpenAI tokens.
+                </Text>
+              </FormHelperText>
+            </FormControl>
           </VStack>
           <HStack>
             <a href="https://beta.openai.com/account/api-keys" target="_blank">
-              Create a new OpenAPI token
+              Manage OpenAI API keys
             </a>
             <ExternalLinkIcon />
           </HStack>
