@@ -6,6 +6,9 @@ const hasStorage = !!chrome.storage?.sync
 
 const getToken = async (): Promise<string | null> => {
     if (!hasStorage) {
+        if (typeof window !== "undefined") {
+            return window.localStorage.getItem("openapi-token")
+        }
         return null
     }
 
@@ -16,6 +19,9 @@ const getToken = async (): Promise<string | null> => {
 const storeToken = async (token: string) => {
     if (hasStorage) {
         await chrome.storage.sync.set({ "openapi-token": token })
+    }
+    else if (typeof window !== "undefined") {
+        return window.localStorage.setItem("openapi-token", token)
     }
 }
 

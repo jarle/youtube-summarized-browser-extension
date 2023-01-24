@@ -1,16 +1,10 @@
 {
   "name": "youtube-summarized-browser-extension",
-  "version": "0.0.0",
+  "version": "0.0.2",
   "author": "Jarle Mathiesen",
-  "description": "",
+  "description": "Chrome extension for summarizing YouTube videos using AI.",
   "type": "module",
   "license": "MIT",
-  "keywords": [
-    "chrome-extension",
-    "react",
-    "vite",
-    "create-chrome-ext"
-  ],
   "engines": {
     "node": ">=14.18.0"
   },

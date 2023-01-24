@@ -20,17 +20,24 @@ async function getSummary(token: string, videoURL: string): Promise<Summary> {
     {
       headers: {
         "openai-token": token,
-        "yt-summarized-request-source": "BROWSER_EXTENSION"
+        "yt-summarized-request-source": "BROWSER_EXTENSION",
+        "Access-Control-Allow-Origin": API_GATEWAY_URL
       }
     }
   )
     .then(
-      res => res.json()
+      async res => {
+        const response = await res.json()
+        if (res.status == 200) {
+          return response
+        }
+        throw Error(`${response.message}`)
+      }
     )
     .catch(
       error => {
         console.error(error)
-        Promise.reject(error.message)
+        throw (error)
       }
     )
 }
@@ -57,9 +64,16 @@ const Summary: FC<{
   }
 
   if (error) {
+    const err = error as Error
     console.error(error)
     return (
-      <Text>An error has occurred</Text>
+      <VStack>
+
+        <Text>An error has occurred</Text>
+        <Text>
+          {`Error message: ${err.message}`}
+        </Text>
+      </VStack>
     )
   }
 
@@ -88,18 +102,6 @@ function App() {
     getCurrentTab()
       .then(url => { setVideoURL(url) })
   }, [])
-
-  // if (!videoURL) {
-  //   return (
-  //     <main>
-  //       <Center padding={5}>
-  //         <VStack w={'50em'} spacing={'1.5em'}>
-  //           <Heading>YouTube Summarizer</Heading>
-  //         </VStack>
-  //       </Center>
-  //     </main>
-  //   )
-  // }
 
   return (
     <main>
