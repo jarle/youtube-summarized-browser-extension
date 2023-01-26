@@ -6,15 +6,11 @@ export default defineManifest({
   version: '0.0.3',
   manifest_version: 3,
   icons: {
-    '16': 'img/16x16.png',
-    '32': 'img/32x32.png',
-    '64': 'img/64x64.png',
-    '128': 'img/128x128.png',
-    '256': 'img/256x256.png',
+    '144': 'img/xxhdpi.png'
   },
   action: {
     default_popup: 'popup.html',
-    default_icon: 'img/128x128.png',
+    default_icon: 'img/xxhdpi.png',
   },
   options_page: 'options.html',
   background: {
@@ -34,12 +30,6 @@ export default defineManifest({
     "https://video-summarizer-gateway-6rjhapzj.uc.gateway.dev/",
     "*://youtube.com/*",
     "*://www.youtube.com/*"
-  ],
-  web_accessible_resources: [
-    {
-      resources: ['img/16x16.png', 'img/32x32.png', 'img/64x64.png', 'img/128x128.png', 'img/256x256.png'],
-      matches: [],
-    },
   ],
   permissions: [
     "storage",

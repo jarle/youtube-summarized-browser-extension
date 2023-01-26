@@ -107,7 +107,7 @@ function App() {
     <main>
       <Center padding={5}>
         <VStack w={'50em'} spacing={'1.5em'}>
-          <Heading>YouTube Summarizer</Heading>
+          <Heading>YouTube Summarized</Heading>
           {
             !openAIToken ? (
               <VStack>

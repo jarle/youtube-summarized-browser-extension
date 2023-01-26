@@ -1,6 +1,6 @@
-import { defineConfig } from 'vite'
 import { crx } from '@crxjs/vite-plugin'
 import react from '@vitejs/plugin-react'
+import { defineConfig } from 'vite'
 
 import manifest from './src/manifest'
 
