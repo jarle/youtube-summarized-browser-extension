@@ -30,7 +30,7 @@ async function getCurrentTab() {
         return "https://www.youtube.com/watch?v=f5j525KpdGc"
     }
     // `tab` will either be a `tabs.Tab` instance or `undefined`.
-    let [tab] = await chrome.tabs.query({ active: true });
+    let [tab] = await chrome.tabs.query({ lastFocusedWindow: true, active: true });
     if (tab.url?.match("(.*)://(.*).youtube.com/.*")?.length) {
         return tab.url;
     }
