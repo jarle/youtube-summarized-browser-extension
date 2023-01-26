@@ -1,5 +1,5 @@
 import { ExternalLinkIcon, SettingsIcon } from '@chakra-ui/icons'
-import { Box, Button, Center, Divider, Heading, HStack, Spinner, Text, Tooltip, VStack } from '@chakra-ui/react'
+import { Box, Button, Center, Divider, Heading, Spinner, Text, Tooltip, VStack } from '@chakra-ui/react'
 import ChakraUIRenderer from 'chakra-ui-markdown-renderer'
 import { FC, useEffect, useState } from 'react'
 import { ReactMarkdown } from 'react-markdown/lib/react-markdown'
@@ -118,12 +118,6 @@ function App() {
                 </a>
               </VStack>
             ) : <>
-              <HStack>
-                <a href="https://beta.openai.com/account/api-keys" target={"_blank"}>
-                  Manage OpenAI API keys
-                </a>
-                <ExternalLinkIcon />
-              </HStack>
               <Tooltip label={videoURL ? `Summarize ${videoURL}` : "Go to YouTube.com to summarize videos"}>
                 <Button
                   isDisabled={!videoURL}
