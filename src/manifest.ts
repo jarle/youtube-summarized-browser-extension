@@ -21,8 +21,19 @@ export default defineManifest({
     service_worker: 'src/background/index.ts',
     type: 'module',
   },
+  content_scripts: [
+    {
+      matches: [
+        "*://youtube.com/*",
+        "*://www.youtube.com/*"
+      ],
+      js: ['src/content/index.ts'],
+    },
+  ],
   host_permissions: [
-    "https://video-summarizer-gateway-6rjhapzj.uc.gateway.dev/"
+    "https://video-summarizer-gateway-6rjhapzj.uc.gateway.dev/",
+    "*://youtube.com/*",
+    "*://www.youtube.com/*"
   ],
   web_accessible_resources: [
     {
@@ -32,7 +43,5 @@ export default defineManifest({
   ],
   permissions: [
     "storage",
-    "tabs",
-    "activeTab"
   ],
 })
