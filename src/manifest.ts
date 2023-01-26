@@ -3,7 +3,7 @@ import { defineManifest } from '@crxjs/vite-plugin'
 export default defineManifest({
   name: 'YouTube Summarized',
   description: 'YouTube videos summarized by AI.',
-  version: '0.0.1',
+  version: '0.0.3',
   manifest_version: 3,
   icons: {
     '16': 'img/16x16.png',
