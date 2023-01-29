@@ -1,5 +1,5 @@
 import { ExternalLinkIcon, SettingsIcon } from '@chakra-ui/icons'
-import { Box, Button, Center, Divider, Heading, Spinner, Text, Tooltip, VStack } from '@chakra-ui/react'
+import { Box, Button, Center, Divider, Heading, HStack, Spinner, Text, Tooltip, VStack } from '@chakra-ui/react'
 import ChakraUIRenderer from 'chakra-ui-markdown-renderer'
 import { FC, useEffect, useState } from 'react'
 import { ReactMarkdown } from 'react-markdown/lib/react-markdown'
@@ -9,10 +9,11 @@ import { getCurrentTab, getToken } from '../background'
 const queryClient = new QueryClient()
 
 type Summary = {
-  summary: string
+  summary: string,
+  videoId: string,
 }
 
-const API_GATEWAY_URL = "https://video-summarizer-gateway-6rjhapzj.uc.gateway.dev"
+const API_GATEWAY_URL = "https://api.youtubesummarized.com"
 
 async function getSummary(token: string, videoURL: string): Promise<Summary> {
   return fetch(
@@ -78,9 +79,19 @@ const Summary: FC<{
   }
 
   const summary = data?.summary || ""
+  const videoId = data?.videoId || ""
 
   return (
     <Box alignContent={'left'} padding={'3em'}>
+      <Center>
+        <a href={`https://youtubesummarized.com/watch?v=${videoId}`} target="_blank">
+          <HStack>
+            <Text>Open full summary</Text>
+            <ExternalLinkIcon />
+          </HStack>
+        </a>
+      </Center>
+
       <ReactMarkdown components={ChakraUIRenderer()} children={summary} skipHtml />
     </Box>
   )
@@ -104,7 +115,7 @@ function App() {
   }, [])
 
   return (
-    <main>
+    <main style={{ backgroundColor: "rgb(243 244 246)" }}>
       <Center padding={5}>
         <VStack w={'50em'} spacing={'1.5em'}>
           <Heading>YouTube Summarized</Heading>

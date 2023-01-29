@@ -27,7 +27,7 @@ export default defineManifest({
     },
   ],
   host_permissions: [
-    "https://video-summarizer-gateway-6rjhapzj.uc.gateway.dev/",
+    "*://api.youtubesummarized.com/*",
     "*://youtube.com/*",
     "*://www.youtube.com/*"
   ],
