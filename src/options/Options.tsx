@@ -77,6 +77,10 @@ function App() {
               Create new OpenAI key
             </a>
           </Button>
+
+          <Text>
+            Need help? Check out the step by step guide <Link href="https://youtubesummarized.com/doc/chrome-extension-guide" fontWeight={'bold'} target="_blank">here.</Link>
+          </Text>
         </VStack>
       </Container>
     </main>
