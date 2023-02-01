@@ -3,6 +3,11 @@ console.info('chrome-ext template-react-ts background script')
 
 const hasStorage = !!chrome.storage?.sync
 
+chrome.runtime?.onInstalled.addListener((details) => {
+    if (details.reason === chrome.runtime.OnInstalledReason.INSTALL) {
+        chrome.runtime.openOptionsPage()
+    }
+});
 
 const getToken = async (): Promise<string | null> => {
     if (!hasStorage) {
@@ -37,5 +42,5 @@ async function getCurrentTab() {
     return null
 }
 
-export { getToken, storeToken, getCurrentTab }
+export { getToken, storeToken, getCurrentTab };
 

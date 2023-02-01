@@ -1,5 +1,5 @@
-import { ExternalLinkIcon, QuestionIcon } from '@chakra-ui/icons'
-import { Container, FormControl, FormErrorMessage, FormHelperText, FormLabel, Heading, HStack, Input, Text, Tooltip, VStack } from '@chakra-ui/react'
+import { CheckIcon, ExternalLinkIcon, QuestionIcon } from '@chakra-ui/icons'
+import { Button, Container, FormControl, FormErrorMessage, FormHelperText, FormLabel, Heading, HStack, Image, Input, InputGroup, InputRightElement, Link, Text, Tooltip, VStack } from '@chakra-ui/react'
 import { useEffect, useState } from 'react'
 import { getToken, storeToken } from '../background'
 
@@ -14,57 +14,69 @@ function App() {
       })
   }, [])
 
-  const invalidApiKey = Boolean(!openAIToken?.startsWith("sk-") || openAIToken?.length !== 51)
+  const invalidAPIKey = !!openAIToken && Boolean(!openAIToken?.startsWith("sk-") || openAIToken?.length !== 51)
 
   return (
     <main>
-      <Container >
-        <VStack padding={'2em'} spacing={5}>
-          <Heading>YouTube Summarized</Heading>
+      <Container>
+        <VStack padding={'2em'} spacing={10}>
+          <HStack>
+            <a href="https://youtubesummarized.com" target={"_blank"}>
+              <Image src="/img/xxhdpi.png" w={'48px'} />
+
+              <Heading>YouTube Summarized</Heading>
+            </a>
+          </HStack>
           <VStack>
 
-            <FormControl>
+            <FormControl isInvalid={invalidAPIKey}>
               <FormLabel>
                 <HStack>
-                  <Heading size={'sm'}>OpenAI API key</Heading>
-                  <Tooltip label="Enter your OpenAI API key below to use the extension.">
+                  <Heading size={'sm'}>OpenAI key</Heading>
+                  <Tooltip label="An OpenAI key is a secret key generated for your account on openai.com, and is required to use this extension.">
                     <QuestionIcon />
                   </Tooltip>
                 </HStack>
               </FormLabel>
-              <Input
-                textAlign={'center'}
-                w="35em"
-                placeholder='Enter OpenAI API key'
-                defaultValue={openAIToken}
-                onChange={
-                  c => {
-                    const newToken = c.target.value
-                    storeToken(newToken)
-                    setOpenAIToken(newToken)
+              <InputGroup>
+                <Input
+                  textAlign={'center'}
+                  w="35em"
+                  placeholder='Enter OpenAI secret key'
+                  defaultValue={openAIToken}
+                  onChange={
+                    c => {
+                      const newToken = c.target.value
+                      storeToken(newToken)
+                      setOpenAIToken(newToken)
+                    }
                   }
+                />
+                {
+                  openAIToken && !invalidAPIKey && <InputRightElement children={<CheckIcon color='green.500' />} />
                 }
-              />
+              </InputGroup>
               {
-                invalidApiKey && (
+                invalidAPIKey && (
                   <FormErrorMessage>
-                    Invalid OpenAI API key format. Did you enter the correct API key?
+                    <Text>
+                      Invalid OpenAI API key format. Did you enter the correct API key?
+                    </Text>
                   </FormErrorMessage>
                 )
               }
               <FormHelperText>
                 <Text>
-                  The API Key will be used when you generate summaries, which will expend OpenAI tokens.
+                  By providing your OpenAI API key and using this extension you agree to <Link fontWeight={'bold'} target="_blank" href="https://youtubesummarized.com/terms">our terms of services.</Link>
                 </Text>
               </FormHelperText>
             </FormControl>
           </VStack>
-          <HStack>
+          <Button colorScheme={openAIToken && !invalidAPIKey ? 'gray' : 'green'} rightIcon={<ExternalLinkIcon />}>
             <a href="https://beta.openai.com/account/api-keys" target="_blank">
-              Manage OpenAI API keys
+              Create new OpenAI key
             </a>
-            <ExternalLinkIcon />
-          </HStack>
+          </Button>
         </VStack>
       </Container>
     </main>
