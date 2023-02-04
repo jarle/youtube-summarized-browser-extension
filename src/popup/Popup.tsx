@@ -6,7 +6,13 @@ import { ReactMarkdown } from 'react-markdown/lib/react-markdown'
 import { QueryClient, QueryClientProvider, useQuery } from 'react-query'
 import { getCurrentTab, getToken } from '../background'
 
-const queryClient = new QueryClient()
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: false
+    }
+  }
+})
 
 type Summary = {
   summary: string,
@@ -52,7 +58,7 @@ const Summary: FC<{
     async () => await getSummary(
       openAIToken,
       videoURL
-    )
+    ),
   )
 
   if (isLoading) {
