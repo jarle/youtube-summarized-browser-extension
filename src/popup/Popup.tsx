@@ -21,6 +21,8 @@ type Summary = {
   videoId: string,
 }
 
+const port = chrome.runtime.connect({ name: 'popup' });
+
 const API_GATEWAY_URL = "https://api.youtubesummarized.com"
 
 async function getSummary(token: string, videoURL: string): Promise<Summary> {
@@ -114,6 +116,12 @@ function App() {
 
   const canSummarize = !!openAIToken && !!videoURL && !summaryURL
 
+  const handler = (response: any) => {
+    if (response.type === 'workComplete') {
+      alert("Hello")
+    }
+  }
+
   useEffect(() => {
     getToken()
       .then(token => {
@@ -124,6 +132,13 @@ function App() {
 
     getCurrentTab()
       .then(url => { setVideoURL(url) })
+
+    port.onMessage.addListener(handler);
+
+    return () => {
+      port.onMessage.removeListener(handler)
+    }
+
   }, [])
 
   return (
@@ -155,6 +170,9 @@ function App() {
                   Summarize video
                 </Button>
               </Tooltip>
+              <Button onClick={() => {
+                port.postMessage({ type: "startWork" })
+              }}>Press me!</Button>
               {
                 summaryURL && <QueryClientProvider client={queryClient}>
                   <Divider />

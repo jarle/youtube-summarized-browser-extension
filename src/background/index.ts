@@ -9,6 +9,24 @@ chrome.runtime?.onInstalled.addListener((details) => {
     }
 });
 
+chrome.runtime.onConnect.addListener(port => {
+    if (port.name === 'popup') {
+        port.onMessage.addListener(request => {
+            if (request.type === 'startWork') {
+                // Perform some work on the background thread
+                // ...
+
+                // Notify the popup when the work is complete
+                port.postMessage({
+                    type: 'workComplete',
+                    result: 'Work complete!'
+                });
+            }
+        });
+    }
+});
+
+
 const getToken = async (): Promise<string | null> => {
     if (!hasStorage) {
         if (typeof window !== "undefined") {
