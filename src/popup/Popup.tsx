@@ -9,7 +9,9 @@ import { getCurrentTab, getToken } from '../background'
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      retry: false
+      retry: false,
+      // 24 hours
+      staleTime: 1000 * 60 * 60 * 24
     }
   }
 })
@@ -53,13 +55,13 @@ const Summary: FC<{
   openAIToken: string,
   videoURL: string
 }> = ({ openAIToken, videoURL }) => {
-  const { isLoading, error, data } = useQuery(
-    'repoData',
-    async () => await getSummary(
+  const { isLoading, error, data } = useQuery({
+    queryKey: `get ${videoURL}`,
+    queryFn: async () => await getSummary(
       openAIToken,
       videoURL
     ),
-  )
+  })
 
   if (isLoading) {
     return (
@@ -104,9 +106,13 @@ const Summary: FC<{
 }
 
 function App() {
-  const [openAIToken, setOpenAIToken] = useState<string | null>()
-  const [summaryURL, setSummaryURL] = useState<string | null>()
-  const [videoURL, setVideoURL] = useState<string | null>()
+  const [openAIToken, setOpenAIToken] = useState<string | undefined>()
+  // the video url that should be summarized
+  const [summaryURL, setSummaryURL] = useState<string | undefined>()
+  // current video if on youtube
+  const [videoURL, setVideoURL] = useState<string | undefined>()
+
+  const canSummarize = !!openAIToken && !!videoURL && !summaryURL
 
   useEffect(() => {
     getToken()
@@ -135,9 +141,9 @@ function App() {
                 </a>
               </VStack>
             ) : <>
-              <Tooltip label={videoURL ? `Summarize ${videoURL}` : "Go to YouTube.com to summarize videos"}>
+              <Tooltip label={canSummarize ? `Summarize ${videoURL}` : !videoURL ? "Go to YouTube.com to summarize videos" : "Unable to summarize"}>
                 <Button
-                  isDisabled={!videoURL}
+                  isDisabled={!canSummarize}
                   colorScheme={'green'}
                   onClick={
                     async e => {

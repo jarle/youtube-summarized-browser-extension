@@ -39,7 +39,7 @@ async function getCurrentTab() {
     if (tab.url?.match("(.*)://(.*).youtube.com/.*")?.length) {
         return tab.url;
     }
-    return null
+    return undefined
 }
 
 export { getToken, storeToken, getCurrentTab };
