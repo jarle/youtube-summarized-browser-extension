@@ -127,7 +127,7 @@ function App() {
   }, [])
 
   return (
-    <main style={{ backgroundColor: "rgb(243 244 246)" }}>
+    <main>
       <Center padding={5}>
         <VStack w={'50em'} spacing={'1.5em'}>
           <Heading>YouTube Summarized</Heading>
