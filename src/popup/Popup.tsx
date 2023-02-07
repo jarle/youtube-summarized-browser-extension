@@ -1,37 +1,28 @@
-import { ExternalLinkIcon, SettingsIcon } from '@chakra-ui/icons'
-import { Box, Button, Center, Divider, Heading, HStack, Text, Tooltip, VStack } from '@chakra-ui/react'
+import { ExternalLinkIcon, SettingsIcon, WarningIcon } from '@chakra-ui/icons'
+import { Box, Button, Center, Divider, Heading, HStack, Spinner, Text, Tooltip, VStack } from '@chakra-ui/react'
+import { useMachine } from '@xstate/react'
 import ChakraUIRenderer from 'chakra-ui-markdown-renderer'
 import { FC, useEffect, useState } from 'react'
 import { ReactMarkdown } from 'react-markdown/lib/react-markdown'
-import { QueryClient } from 'react-query'
 import { getCurrentTab, getToken } from '../background'
-import { SummaryRequest, SummaryResponse } from '../types'
-
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      retry: false,
-      // 24 hours
-      staleTime: 1000 * 60 * 60 * 24
-    }
-  }
-})
+import { summaryMachine } from '../machines/summaryMachine'
+import { ServiceResponse, SummaryRequest, SummaryState } from '../types'
 
 const summaryPort = chrome.runtime.connect({ name: 'summaries' });
 
 const Summary: FC<{
   summary: string,
-  // videoId: string
-}> = ({ summary }) => {
+  videoId: string
+}> = ({ videoId, summary }) => {
   return (
     <Box alignContent={'left'} padding={'3em'}>
       <Center>
-        {/* <a href={`https://youtubesummarized.com/watch?v=${videoId}`} target="_blank"> */}
-        <HStack>
-          <Text>Open full summary</Text>
-          <ExternalLinkIcon />
-        </HStack>
-        {/* </a> */}
+        <a href={`https://youtubesummarized.com/watch?v=${videoId}`} target="_blank">
+          <HStack>
+            <Text>Open full summary</Text>
+            <ExternalLinkIcon />
+          </HStack>
+        </a>
       </Center>
 
       <ReactMarkdown components={ChakraUIRenderer()} children={summary} skipHtml />
@@ -43,13 +34,43 @@ function App() {
   const [openAIToken, setOpenAIToken] = useState<string | undefined>()
   // current video if on youtube
   const [videoURL, setVideoURL] = useState<string | undefined>()
-  // video summary in markdown
-  const [summary, setSummary] = useState<string | undefined>()
+
+  const [state, send] = useMachine(summaryMachine, {
+    actions: {
+      scheduleSummary: async () => {
+        await getCurrentTab()
+          .then(
+            async tab => {
+              const message: SummaryRequest = {
+                type: "summary_request",
+                videoURL: tab!
+              }
+              summaryPort.postMessage(message)
+            }
+          )
+      }
+    }
+  })
+
+  const { summary } = state.context
+  const summaryState = (state.value as SummaryState)
 
   const canSummarize = !!openAIToken && !!videoURL
 
-  const summaryHandler = (response: SummaryResponse) => {
-    setSummary(response.summary)
+  const summaryHandler = (response: ServiceResponse) => {
+    switch (response.type) {
+      case "summary_response":
+        return send({
+          type: "SummaryReceived",
+          summary: response.summary!!,
+          videoId: response.videoId
+        })
+      case "error":
+        return send({
+          type: "SummaryFailed",
+          message: response.message
+        })
+    }
   }
 
   useEffect(() => {
@@ -70,6 +91,7 @@ function App() {
 
   }, [])
 
+
   return (
     <main>
       <Center padding={5}>
@@ -85,23 +107,13 @@ function App() {
                 </a>
               </VStack>
             ) : <>
-              {!summary && <Tooltip label={canSummarize ? `Summarize ${videoURL}` : !videoURL ? "Go to YouTube.com to summarize videos" : "Unable to summarize"}>
+              {!state.context.summary && <Tooltip label={canSummarize ? `Summarize ${videoURL}` : !videoURL ? "Go to YouTube.com to summarize videos" : "Unable to summarize"}>
                 <Button
                   isDisabled={!canSummarize}
                   colorScheme={'green'}
                   onClick={
                     async e => {
-                      await getCurrentTab()
-                        .then(
-                          async tab => {
-                            const message: SummaryRequest = {
-                              type: "summary_request",
-                              videoURL: videoURL!
-                            }
-                            console.log("Posting message")
-                            summaryPort.postMessage(message)
-                          }
-                        )
+                      send("Summarize")
                     }
                   }
                 >
@@ -110,10 +122,27 @@ function App() {
               </Tooltip>
               }
               {
+                summaryState === "loading" && (
+                  <VStack>
+                    <Text>Loading Summary</Text>
+                    <Spinner />
+                  </VStack>
+                )
+              }
+              {
+                summaryState === "failed" && (
+                  <HStack>
+                    <WarningIcon />
+                    <Text>{state.context.errorMessage}</Text>
+                  </HStack>
+                )
+              }
+              {
                 summary && <>
                   <Divider />
                   <Summary
                     summary={summary}
+                    videoId={state.context.videoId!!}
                   />
                 </>
               }

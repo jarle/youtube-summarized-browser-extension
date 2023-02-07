@@ -20,21 +20,25 @@ chrome.runtime.onConnect.addListener(port => {
                 videoURL,
             }
             port.postMessage(ack)
+            console.debug({ ack })
 
             try {
                 const token = await getToken()
                 const result = await getSummary(token!, videoURL)
                 const firstResponse: SummaryResponse = {
+                    type: "summary_response",
                     videoId: result.videoId,
                     preview: result.summary,
                     summary: result.summary
                 }
+                console.debug({ firstResponse })
                 port.postMessage(firstResponse)
             } catch (error) {
                 const errorResponse: ErrorResponse = {
                     type: "error",
                     message: (error as any).message || "Unknown error"
                 }
+                console.debug({ errorResponse })
                 port.postMessage(errorResponse)
             }
         }
@@ -103,7 +107,5 @@ async function getCurrentTab(): Promise<string | undefined> {
     }
     return undefined
 }
-console.log("hello")
-
 export { getToken, storeToken, getCurrentTab };
 

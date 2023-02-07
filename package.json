@@ -21,14 +21,15 @@
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",
     "@types/chrome": "^0.0.209",
+    "@xstate/react": "^3.1.2",
     "chakra-ui-markdown-renderer": "^4.1.0",
     "framer-motion": "^8.5.0",
     "is-youtube-url": "^1.0.5",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-markdown": "^8.0.5",
-    "react-query": "^3.39.2",
-    "remark-gfm": "^3.0.1"
+    "remark-gfm": "^3.0.1",
+    "xstate": "^4.35.4"
   },
   "devDependencies": {
     "@crxjs/vite-plugin": "^1.0.12",
