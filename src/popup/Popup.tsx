@@ -55,7 +55,7 @@ function App() {
   const { summary } = state.context
   const summaryState = (state.value as SummaryState)
 
-  const canSummarize = !!openAIToken && !!videoURL
+  const canSummarize = !!openAIToken && !!videoURL && ["empty", "failed"].includes(summaryState)
 
   const summaryHandler = (response: ServiceResponse) => {
     switch (response.type) {
