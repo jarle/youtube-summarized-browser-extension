@@ -12,11 +12,6 @@ export type SummaryRequest = {
 
 export type ServiceRequest = SummaryRequest
 
-export type SummaryAck = {
-    type: "summary_ack",
-    videoURL: string
-}
-
 export type ErrorResponse = {
     type: "error",
     message: string
@@ -30,7 +25,7 @@ export type SummaryResponse = {
     summary: string | undefined
 }
 
-export type ServiceResponse = SummaryAck | ErrorResponse | SummaryResponse
+export type ServiceResponse = ErrorResponse | SummaryResponse
 
 
 export type Summary = {

@@ -1,4 +1,4 @@
-import { ErrorResponse, ServiceRequest, Summary, SummaryAck, SummaryRequest, SummaryResponse } from "../types";
+import { ErrorResponse, ServiceRequest, Summary, SummaryRequest, SummaryResponse } from "../types";
 
 console.info('chrome-ext template-react-ts background script')
 
@@ -15,13 +15,6 @@ chrome.runtime.onConnect.addListener(port => {
     port.onMessage?.addListener(async (message: ServiceRequest) => {
         if (message.type == "summary_request") {
             const { videoURL } = (message as SummaryRequest)
-            const ack: SummaryAck = {
-                type: "summary_ack",
-                videoURL,
-            }
-            port.postMessage(ack)
-            console.debug({ ack })
-
             try {
                 const token = await getToken()
                 const result = await getSummary(token!, videoURL)
