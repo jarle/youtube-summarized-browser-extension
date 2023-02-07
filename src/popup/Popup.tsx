@@ -1,94 +1,19 @@
-import { ExternalLinkIcon, SettingsIcon } from '@chakra-ui/icons'
+import { ExternalLinkIcon, SettingsIcon, WarningIcon } from '@chakra-ui/icons'
 import { Box, Button, Center, Divider, Heading, HStack, Spinner, Text, Tooltip, VStack } from '@chakra-ui/react'
+import { useMachine } from '@xstate/react'
 import ChakraUIRenderer from 'chakra-ui-markdown-renderer'
 import { FC, useEffect, useState } from 'react'
 import { ReactMarkdown } from 'react-markdown/lib/react-markdown'
-import { QueryClient, QueryClientProvider, useQuery } from 'react-query'
 import { getCurrentTab, getToken } from '../background'
+import { summaryMachine } from '../machines/summaryMachine'
+import { ServiceResponse, SummaryRequest, SummaryState } from '../types'
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      retry: false,
-      // 24 hours
-      staleTime: 1000 * 60 * 60 * 24
-    }
-  }
-})
-
-type Summary = {
-  summary: string,
-  videoId: string,
-}
-
-const API_GATEWAY_URL = "https://api.youtubesummarized.com"
-
-async function getSummary(token: string, videoURL: string): Promise<Summary> {
-  return fetch(
-    `${API_GATEWAY_URL}/v1/youtube/summarizeVideoWithToken?videoURL=${videoURL}`,
-    {
-      headers: {
-        "openai-token": token,
-        "yt-summarized-request-source": "BROWSER_EXTENSION",
-        "Access-Control-Allow-Origin": API_GATEWAY_URL
-      }
-    }
-  )
-    .then(
-      async res => {
-        const response = await res.json()
-        if (res.status == 200) {
-          return response
-        }
-        throw Error(`${response.message}`)
-      }
-    )
-    .catch(
-      error => {
-        console.error(error)
-        throw (error)
-      }
-    )
-}
+const summaryPort = chrome.runtime.connect({ name: 'summaries' });
 
 const Summary: FC<{
-  openAIToken: string,
-  videoURL: string
-}> = ({ openAIToken, videoURL }) => {
-  const { isLoading, error, data } = useQuery({
-    queryKey: `get ${videoURL}`,
-    queryFn: async () => await getSummary(
-      openAIToken,
-      videoURL
-    ),
-  })
-
-  if (isLoading) {
-    return (
-      <VStack>
-        <Spinner />
-        <Text> {'Generating summary...'} </Text>
-      </VStack>
-    )
-  }
-
-  if (error) {
-    const err = error as Error
-    console.error(error)
-    return (
-      <VStack>
-
-        <Text>An error has occurred</Text>
-        <Text>
-          {`Error message: ${err.message}`}
-        </Text>
-      </VStack>
-    )
-  }
-
-  const summary = data?.summary || ""
-  const videoId = data?.videoId || ""
-
+  summary: string,
+  videoId: string
+}> = ({ videoId, summary }) => {
   return (
     <Box alignContent={'left'} padding={'3em'}>
       <Center>
@@ -107,12 +32,46 @@ const Summary: FC<{
 
 function App() {
   const [openAIToken, setOpenAIToken] = useState<string | undefined>()
-  // the video url that should be summarized
-  const [summaryURL, setSummaryURL] = useState<string | undefined>()
   // current video if on youtube
   const [videoURL, setVideoURL] = useState<string | undefined>()
 
-  const canSummarize = !!openAIToken && !!videoURL && !summaryURL
+  const [state, send] = useMachine(summaryMachine, {
+    actions: {
+      scheduleSummary: async () => {
+        await getCurrentTab()
+          .then(
+            async tab => {
+              const message: SummaryRequest = {
+                type: "summary_request",
+                videoURL: tab!
+              }
+              summaryPort.postMessage(message)
+            }
+          )
+      }
+    }
+  })
+
+  const { summary } = state.context
+  const summaryState = (state.value as SummaryState)
+
+  const canSummarize = !!openAIToken && !!videoURL && ["empty", "failed"].includes(summaryState)
+
+  const summaryHandler = (response: ServiceResponse) => {
+    switch (response.type) {
+      case "summary_response":
+        return send({
+          type: "SummaryReceived",
+          summary: response.summary!!,
+          videoId: response.videoId
+        })
+      case "error":
+        return send({
+          type: "SummaryFailed",
+          message: response.message
+        })
+    }
+  }
 
   useEffect(() => {
     getToken()
@@ -124,7 +83,14 @@ function App() {
 
     getCurrentTab()
       .then(url => { setVideoURL(url) })
+
+    summaryPort.onMessage.addListener(summaryHandler);
+    return () => {
+      summaryPort.onMessage.removeListener(summaryHandler)
+    }
+
   }, [])
+
 
   return (
     <main>
@@ -141,28 +107,44 @@ function App() {
                 </a>
               </VStack>
             ) : <>
-              <Tooltip label={canSummarize ? `Summarize ${videoURL}` : !videoURL ? "Go to YouTube.com to summarize videos" : "Unable to summarize"}>
+              {!state.context.summary && <Tooltip label={canSummarize ? `Summarize ${videoURL}` : !videoURL ? "Go to YouTube.com to summarize videos" : "Unable to summarize"}>
                 <Button
                   isDisabled={!canSummarize}
                   colorScheme={'green'}
                   onClick={
                     async e => {
-                      await getCurrentTab()
-                        .then(tab => setSummaryURL(tab))
+                      send("Summarize")
                     }
                   }
                 >
                   Summarize video
                 </Button>
               </Tooltip>
+              }
               {
-                summaryURL && <QueryClientProvider client={queryClient}>
+                summaryState === "loading" && (
+                  <VStack>
+                    <Text>Loading Summary</Text>
+                    <Spinner />
+                  </VStack>
+                )
+              }
+              {
+                summaryState === "failed" && (
+                  <HStack>
+                    <WarningIcon />
+                    <Text>{state.context.errorMessage}</Text>
+                  </HStack>
+                )
+              }
+              {
+                summary && <>
                   <Divider />
                   <Summary
-                    openAIToken={openAIToken}
-                    videoURL={summaryURL}
+                    summary={summary}
+                    videoId={state.context.videoId!!}
                   />
-                </QueryClientProvider>
+                </>
               }
             </>
           }
