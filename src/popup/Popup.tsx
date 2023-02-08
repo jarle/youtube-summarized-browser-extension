@@ -10,6 +10,22 @@ import { ServiceResponse, SummaryRequest, SummaryState } from '../types'
 
 const summaryPort = chrome.runtime.connect({ name: 'summaries' });
 
+
+const getSummaryButtonTooltext = (summaryState: SummaryState): string => {
+  switch (summaryState) {
+    case "empty":
+      return "Summarize video"
+    case "loading":
+      return "Generating summary..."
+    case "failed":
+      return "Summary failed"
+    case "summarized":
+      return ""
+  }
+
+
+}
+
 const Summary: FC<{
   summary: string,
   videoId: string
@@ -91,6 +107,7 @@ function App() {
 
   }, [])
 
+  const buttonTooltipText = getSummaryButtonTooltext(summaryState)
 
   return (
     <main>
@@ -107,7 +124,7 @@ function App() {
                 </a>
               </VStack>
             ) : <>
-              {!state.context.summary && <Tooltip label={canSummarize ? `Summarize ${videoURL}` : !videoURL ? "Go to YouTube.com to summarize videos" : "Unable to summarize"}>
+              {!state.context.summary && <Tooltip label={buttonTooltipText}>
                 <Button
                   isDisabled={!canSummarize}
                   colorScheme={'green'}
