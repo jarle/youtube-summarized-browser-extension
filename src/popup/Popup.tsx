@@ -14,7 +14,7 @@ const summaryPort = chrome.runtime.connect({ name: 'summaries' });
 const getSummaryButtonTooltext = (summaryState: SummaryState): string => {
   switch (summaryState) {
     case "empty":
-      return "Summarize video"
+      return "Summarize this video using OpenAI tokens"
     case "loading":
       return "Generating summary..."
     case "failed":
@@ -107,7 +107,7 @@ function App() {
 
   }, [])
 
-  const buttonTooltipText = getSummaryButtonTooltext(summaryState)
+  const buttonTooltipText = videoURL && getSummaryButtonTooltext(summaryState) || "Find a video on youtube.com to summarize videos"
 
   return (
     <main>
