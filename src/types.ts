@@ -10,13 +10,20 @@ export type SummaryRequest = {
     videoURL: string
 }
 
-export type ServiceRequest = SummaryRequest
+export type UserInfoRequest = {
+    type: "user_info_request",
+}
+
+export type ServiceRequest = UserInfoRequest | SummaryRequest
 
 export type ErrorResponse = {
     type: "error",
     message: string
 }
 
+export type UserInfo = {
+    accumulatedCost: string
+}
 
 export type SummaryResponse = {
     type: "summary_response",
@@ -25,7 +32,12 @@ export type SummaryResponse = {
     summary: string | undefined
 }
 
-export type ServiceResponse = ErrorResponse | SummaryResponse
+export type UserInfoResponse = {
+    type: "user_info_response",
+    accumulatedCost: number
+}
+
+export type ServiceResponse = UserInfoResponse | ErrorResponse | SummaryResponse
 
 
 export type Summary = {

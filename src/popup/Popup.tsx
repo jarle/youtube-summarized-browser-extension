@@ -1,12 +1,12 @@
 import { ExternalLinkIcon, SettingsIcon, WarningIcon } from '@chakra-ui/icons'
-import { Box, Button, Center, Divider, Heading, HStack, Spinner, Text, Tooltip, VStack } from '@chakra-ui/react'
+import { Box, Button, Center, Divider, Heading, HStack, Link, Spinner, Tag, Text, Tooltip, VStack } from '@chakra-ui/react'
 import { useMachine } from '@xstate/react'
 import ChakraUIRenderer from 'chakra-ui-markdown-renderer'
 import { FC, useEffect, useState } from 'react'
 import { ReactMarkdown } from 'react-markdown/lib/react-markdown'
 import { getCurrentTab, getToken } from '../background'
 import { summaryMachine } from '../machines/summaryMachine'
-import { ServiceResponse, SummaryRequest, SummaryState } from '../types'
+import { ServiceResponse, SummaryRequest, SummaryState, UserInfoRequest } from '../types'
 
 const summaryPort = chrome.runtime.connect({ name: 'summaries' });
 
@@ -50,6 +50,7 @@ function App() {
   const [openAIToken, setOpenAIToken] = useState<string | undefined>()
   // current video if on youtube
   const [videoURL, setVideoURL] = useState<string | undefined>()
+  const [accumulatedCost, setAccumulatedCost] = useState<number | undefined>()
 
   const [state, send] = useMachine(summaryMachine, {
     actions: {
@@ -73,7 +74,7 @@ function App() {
 
   const canSummarize = !!openAIToken && !!videoURL && ["empty", "failed"].includes(summaryState)
 
-  const summaryHandler = (response: ServiceResponse) => {
+  const messageHandler = (response: ServiceResponse) => {
     switch (response.type) {
       case "summary_response":
         return send({
@@ -81,6 +82,9 @@ function App() {
           summary: response.summary!!,
           videoId: response.videoId
         })
+      case "user_info_response":
+        const { accumulatedCost: cost } = response
+        return setAccumulatedCost(cost)
       case "error":
         return send({
           type: "SummaryFailed",
@@ -94,15 +98,19 @@ function App() {
       .then(token => {
         if (token) {
           setOpenAIToken(token)
+          const message: UserInfoRequest = {
+            type: "user_info_request",
+          }
+          summaryPort.postMessage(message)
         }
       })
 
     getCurrentTab()
       .then(url => { setVideoURL(url) })
 
-    summaryPort.onMessage.addListener(summaryHandler);
+    summaryPort.onMessage.addListener(messageHandler);
     return () => {
-      summaryPort.onMessage.removeListener(summaryHandler)
+      summaryPort.onMessage.removeListener(messageHandler)
     }
 
   }, [])
@@ -113,16 +121,16 @@ function App() {
     <main>
       <Center padding={5}>
         <VStack w={'50em'} spacing={'1.5em'}>
-          <Heading>YouTube Summarized</Heading>
+          <HStack>
+            <Heading>YouTube Summarized</Heading>
+          </HStack>
           {
             !openAIToken ? (
-              <VStack>
-                <a onClick={() => chrome.runtime.openOptionsPage()}>
-                  <Button leftIcon={<SettingsIcon />} rightIcon={<ExternalLinkIcon />}>
-                    Start using the extension by entering an OpenAI key in the settings
-                  </Button>
-                </a>
-              </VStack>
+              <a onClick={() => chrome.runtime.openOptionsPage()}>
+                <Button leftIcon={<SettingsIcon />} rightIcon={<ExternalLinkIcon />}>
+                  Start using the extension by entering an OpenAI key in the settings
+                </Button>
+              </a>
             ) : <>
               {!state.context.summary && <Tooltip label={buttonTooltipText}>
                 <Button
@@ -137,6 +145,20 @@ function App() {
                   Summarize video
                 </Button>
               </Tooltip>
+              }
+              {
+                accumulatedCost ? (
+                  <Tooltip label="Your accumulated cost for generated summaries this month, excluding local tax. See openai.com for more details.">
+                    <Link href="https://platform.openai.com/account/usage" target={"_blank"}>
+                      <HStack>
+                        <Tag>
+                          <Text>{`$${accumulatedCost.toFixed(2)}`}</Text>
+                        </Tag>
+                        <ExternalLinkIcon />
+                      </HStack>
+                    </Link>
+                  </Tooltip>
+                ) : null
               }
               {
                 summaryState === "loading" && (

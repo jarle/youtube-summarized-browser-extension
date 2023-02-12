@@ -1,4 +1,4 @@
-import { ErrorResponse, ServiceRequest, Summary, SummaryRequest, SummaryResponse } from "../types";
+import { ErrorResponse, ServiceRequest, Summary, SummaryRequest, SummaryResponse, UserInfo, UserInfoResponse } from "../types";
 
 console.info('chrome-ext template-react-ts background script')
 
@@ -35,11 +35,59 @@ chrome.runtime.onConnect.addListener(port => {
                 port.postMessage(errorResponse)
             }
         }
+        else if (message.type == "user_info_request") {
+            try {
+                const token = await getToken()
+                const result = await getUserInfo(token!)
+                const firstResponse: UserInfoResponse = {
+                    type: "user_info_response",
+                    accumulatedCost: Number.parseFloat(result.accumulatedCost)
+                }
+                console.debug({ firstResponse })
+                port.postMessage(firstResponse)
+            } catch (error) {
+                const errorResponse: ErrorResponse = {
+                    type: "error",
+                    message: (error as any).message || "Unknown error"
+                }
+                console.debug({ errorResponse })
+                port.postMessage(errorResponse)
+            }
+        }
     })
 
 })
 
 const API_GATEWAY_URL = "https://api.youtubesummarized.com"
+
+async function getUserInfo(token: string): Promise<UserInfo> {
+    return fetch(
+        `${API_GATEWAY_URL}/v1/user/info`,
+        {
+            headers: {
+                "openai-token": token,
+                "yt-summarized-request-source": "BROWSER_EXTENSION",
+                "Access-Control-Allow-Origin": API_GATEWAY_URL
+            }
+        }
+    )
+        .then(
+            async res => {
+                const response = await res.json()
+                if (res.status == 200) {
+                    return response
+                }
+                throw Error(`${response.message}`)
+            }
+        )
+        .catch(
+            error => {
+                console.error(error)
+                throw (error)
+            }
+        )
+}
+
 async function getSummary(token: string, videoURL: string): Promise<Summary> {
     return fetch(
         `${API_GATEWAY_URL}/v1/youtube/summarizeVideoWithToken?videoURL=${videoURL}`,
