@@ -7,7 +7,17 @@ import { SummaryRequestMessage } from '../messaging/summaryPort'
 import { ytSummarizedTheme } from '../theme'
 import { Popup } from './components/Popup'
 import { summaryPort } from './messaging'
-import { SummaryContext } from './state'
+import { SummaryContext, UserInfoContext } from './state'
+
+const getTokenService = async () => {
+  const openAIToken = await getToken()
+  if (!openAIToken) {
+    throw new Error("No OpenAI token found")
+  }
+  return {
+    openAIToken
+  }
+}
 
 function App() {
   const scheduleSummary = async () => {
@@ -23,27 +33,27 @@ function App() {
       )
   }
   return (
-    <SummaryContext.Provider options={{
-      actions: { scheduleSummary },
-      services: {
-        getToken: async () => {
-          const openAIToken = await getToken()
-          if (!openAIToken) {
-            throw new Error("No OpenAI token found")
-          }
-          return {
-            openAIToken
-          }
-
+    <React.StrictMode>
+      <SummaryContext.Provider options={{
+        actions: { scheduleSummary },
+        services: {
+          getToken: getTokenService
         }
-      }
-    }}>
-      <React.StrictMode>
-        <ChakraProvider theme={ytSummarizedTheme}>
-          <Popup />
-        </ChakraProvider>
-      </React.StrictMode>
-    </SummaryContext.Provider >
+      }}>
+        <UserInfoContext.Provider options={{
+          services: {
+            getToken: getTokenService
+          },
+          guards: {
+            hasToken: (ctx, evt) => !!ctx.openAIToken
+          }
+        }}>
+          <ChakraProvider theme={ytSummarizedTheme}>
+            <Popup />
+          </ChakraProvider>
+        </UserInfoContext.Provider>
+      </SummaryContext.Provider >
+    </React.StrictMode>
   )
 }
 

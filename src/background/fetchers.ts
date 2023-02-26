@@ -1,4 +1,4 @@
-import { Summary } from "../types";
+import { APISummary } from "../types";
 import { APIUserInfo } from './../types';
 
 const API_GATEWAY_URL = "https://api.youtubesummarized.com"
@@ -31,7 +31,7 @@ export async function getUserInfo(token: string): Promise<APIUserInfo> {
         )
 }
 
-export async function getSummary(token: string, videoURL: string): Promise<Summary> {
+export async function getSummary(token: string, videoURL: string): Promise<APISummary> {
     return fetch(
         `${API_GATEWAY_URL}/v1/youtube/summarizeVideoWithToken?videoURL=${videoURL}`,
         {

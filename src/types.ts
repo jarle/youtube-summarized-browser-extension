@@ -1,14 +1,8 @@
-import { SummaryRequestMessage, SummaryResponseMessage } from './messaging/summaryPort';
-import { UserInfoRequestMessage, UserInfoResponseMessage } from './messaging/userInfoPort';
 
 export type TabInfo = {
     url: string,
     tabId: number
 }
-
-export type SummaryState = "idle" | "loading" | "failed" | "summarized"
-
-export type ServiceRequestMessage = UserInfoRequestMessage | SummaryRequestMessage
 
 export type ErrorResponseMessage = {
     type: "error",
@@ -23,10 +17,7 @@ export type UserInfo = {
     accumulatedCost: number
 }
 
-export type ServiceResponse = UserInfoResponseMessage | ErrorResponseMessage | SummaryResponseMessage
-
-
-export type Summary = {
+export type APISummary = {
     summary: string,
     videoId: string,
 }
