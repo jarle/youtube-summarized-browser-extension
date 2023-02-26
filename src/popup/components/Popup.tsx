@@ -1,13 +1,13 @@
 import { ExternalLinkIcon, SettingsIcon, WarningIcon } from '@chakra-ui/icons'
 import { Button, Center, Divider, Heading, HStack, Link, Spinner, Tag, Text, Tooltip, VStack } from '@chakra-ui/react'
+import { useMachine } from '@xstate/react'
 import { useEffect, useState } from 'react'
-import { getCurrentTab } from '../../common/tabHandler'
-import { getToken } from '../../common/tokenHandler'
 import { SummaryResponseMessage } from '../../messaging/summaryPort'
 import { UserInfoRequestMessage, UserInfoResponseMessage } from '../../messaging/userInfoPort'
 import { SummaryState } from '../../types'
 import { summaryPort, userInfoPort } from '../messaging'
 import { SummaryContext } from '../SummaryContext'
+import { popupMachine } from './popupMachine'
 import { SummarizeButton } from './SummarizeButton'
 import { Summary } from './Summary'
 
@@ -25,9 +25,6 @@ const getSummaryButtonTooltext = (summaryState: SummaryState): string => {
 }
 
 export function Popup() {
-  const [openAIToken, setOpenAIToken] = useState<string | undefined>()
-  // current video if on youtube
-  const [videoURL, setVideoURL] = useState<string | undefined>()
   const [accumulatedCost, setAccumulatedCost] = useState<number | undefined>()
 
   const updateSummaryState = SummaryContext.useActorRef().send
@@ -35,15 +32,20 @@ export function Popup() {
   const { summary, errorMessage, videoId } = SummaryContext.useSelector(state => state.context)
   const summaryState = (SummaryContext.useSelector(state => state.value) as SummaryState)
 
+  const [popupState, updatePopupState] = useMachine(popupMachine)
+  const { videoURL, openAIToken } = popupState.context
+
   const summaryPortHandler = (response: SummaryResponseMessage) => {
     switch (response.type) {
       case "summary_response":
+        updatePopupState("Success")
         return updateSummaryState({
           type: "SummaryReceived",
           summary: response.summary!!,
           videoId: response.videoId
         })
       case "error":
+        updatePopupState("Error")
         return updateSummaryState({
           type: "SummaryFailed",
           message: response.message
@@ -64,19 +66,12 @@ export function Popup() {
   }
 
   useEffect(() => {
-    getToken()
-      .then(token => {
-        if (token) {
-          setOpenAIToken(token)
-          const message: UserInfoRequestMessage = {
-            type: "user_info_request",
-          }
-          userInfoPort.postMessage(message)
-        }
-      })
-
-    getCurrentTab()
-      .then(url => { setVideoURL(url) })
+    if (openAIToken) {
+      const message: UserInfoRequestMessage = {
+        type: "user_info_request",
+      }
+      userInfoPort.postMessage(message)
+    }
 
     summaryPort.onMessage.addListener(summaryPortHandler);
     userInfoPort.onMessage.addListener(userPortHandler);
@@ -85,14 +80,16 @@ export function Popup() {
       userInfoPort.onMessage.removeListener(userPortHandler)
     }
 
-  }, [])
+  }, [openAIToken])
 
   const buttonTooltipText = videoURL && getSummaryButtonTooltext(summaryState) || "Find a video on youtube.com to summarize videos"
+  const state = popupState.value
 
   return (
     <main>
       <Center padding={5}>
         <VStack w={'50em'} spacing={'1.5em'}>
+          <pre>{JSON.stringify(state)}</pre>
           <HStack>
             <Heading>YouTube Summarized</Heading>
           </HStack>
