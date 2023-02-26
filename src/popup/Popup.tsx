@@ -1,11 +1,13 @@
 import { ExternalLinkIcon, SettingsIcon, WarningIcon } from '@chakra-ui/icons'
 import { Button, Center, Divider, Heading, HStack, Link, Spinner, Tag, Text, Tooltip, VStack } from '@chakra-ui/react'
 import { useEffect, useState } from 'react'
-import { getCurrentTab, getToken } from '../background'
+import { getCurrentTab } from '../common/tabHandler'
+import { getToken } from '../common/tokenHandler'
 import { SummaryResponseMessage } from '../messaging/summaryPort'
 import { UserInfoRequestMessage, UserInfoResponseMessage } from '../messaging/userInfoPort'
 import { SummaryState } from '../types'
 import { summaryPort, userInfoPort } from './messaging'
+import { SummarizeButton } from './SummarizeButton'
 import { Summary } from './Summary'
 import { SummaryContext } from './SummaryContext'
 
@@ -32,8 +34,6 @@ export function Popup() {
 
   const { summary, errorMessage, videoId } = SummaryContext.useSelector(state => state.context)
   const summaryState = (SummaryContext.useSelector(state => state.value) as SummaryState)
-
-  const canSummarize = !!openAIToken && !!videoURL && ["idle", "failed"].includes(summaryState)
 
   const summaryPortHandler = (response: SummaryResponseMessage) => {
     switch (response.type) {
@@ -105,20 +105,7 @@ export function Popup() {
               </a>
             ) : <>
               {!summary && <Tooltip label={buttonTooltipText}>
-                <Button
-                  isDisabled={!canSummarize}
-                  colorScheme={'green'}
-                  onClick={
-                    async _ => {
-                      updateSummaryState({
-                        type: "Summarize",
-                        videoURL: videoURL!!
-                      })
-                    }
-                  }
-                >
-                  Summarize video
-                </Button>
+                <SummarizeButton videoURL={videoURL!!} />
               </Tooltip>
               }
               {

@@ -1,4 +1,4 @@
-import { getToken } from "."
+import { getToken } from "../common/tokenHandler"
 import { SummaryRequestMessage, SummaryResponseMessage } from "../messaging/summaryPort"
 import { ErrorResponseMessage } from "../types"
 import { getSummary } from "./fetchers"

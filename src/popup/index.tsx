@@ -1,7 +1,7 @@
 import { ChakraProvider } from '@chakra-ui/react'
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import { getCurrentTab } from '../background'
+import { getCurrentTab } from '../common/tabHandler'
 import { SummaryRequestMessage } from '../messaging/summaryPort'
 import { ytSummarizedTheme } from '../theme'
 import { summaryPort } from './messaging'

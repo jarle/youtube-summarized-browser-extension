@@ -1,4 +1,4 @@
-import { getToken } from "."
+import { getToken } from "../common/tokenHandler"
 import { UserInfoRequestMessage, UserInfoResponseMessage } from "../messaging/userInfoPort"
 import { ErrorResponseMessage } from "../types"
 import { getUserInfo } from "./fetchers"
