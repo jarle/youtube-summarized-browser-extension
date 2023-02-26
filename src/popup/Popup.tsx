@@ -1,92 +1,62 @@
 import { ExternalLinkIcon, SettingsIcon, WarningIcon } from '@chakra-ui/icons'
-import { Box, Button, Center, Divider, Heading, HStack, Link, Spinner, Tag, Text, Tooltip, VStack } from '@chakra-ui/react'
-import { useMachine } from '@xstate/react'
-import ChakraUIRenderer from 'chakra-ui-markdown-renderer'
-import { FC, useEffect, useState } from 'react'
-import { ReactMarkdown } from 'react-markdown/lib/react-markdown'
+import { Button, Center, Divider, Heading, HStack, Link, Spinner, Tag, Text, Tooltip, VStack } from '@chakra-ui/react'
+import { useEffect, useState } from 'react'
 import { getCurrentTab, getToken } from '../background'
-import { summaryMachine } from '../machines/summaryMachine'
-import { ServiceResponse, SummaryRequest, SummaryState, UserInfoRequest } from '../types'
-
-const summaryPort = chrome.runtime.connect({ name: 'summaries' });
-
+import { SummaryResponseMessage } from '../messaging/summaryPort'
+import { UserInfoRequestMessage, UserInfoResponseMessage } from '../messaging/userInfoPort'
+import { SummaryState } from '../types'
+import { summaryPort, userInfoPort } from './messaging'
+import { Summary } from './Summary'
+import { SummaryContext } from './SummaryContext'
 
 const getSummaryButtonTooltext = (summaryState: SummaryState): string => {
   switch (summaryState) {
-    case "empty":
+    case "idle":
       return "Summarize this video using OpenAI tokens"
     case "loading":
       return "Generating summary..."
     case "failed":
       return "Summary failed"
     case "summarized":
-      return ""
+      return "Summarized"
   }
-
-
 }
 
-const Summary: FC<{
-  summary: string,
-  videoId: string
-}> = ({ videoId, summary }) => {
-  return (
-    <Box alignContent={'left'} padding={'3em'}>
-      <Center>
-        <a href={`https://youtubesummarized.com/watch?v=${videoId}`} target="_blank">
-          <HStack>
-            <Text>Open full summary</Text>
-            <ExternalLinkIcon />
-          </HStack>
-        </a>
-      </Center>
-
-      <ReactMarkdown components={ChakraUIRenderer()} children={summary} skipHtml />
-    </Box>
-  )
-}
-
-function App() {
+export function Popup() {
   const [openAIToken, setOpenAIToken] = useState<string | undefined>()
   // current video if on youtube
   const [videoURL, setVideoURL] = useState<string | undefined>()
   const [accumulatedCost, setAccumulatedCost] = useState<number | undefined>()
 
-  const [state, send] = useMachine(summaryMachine, {
-    actions: {
-      scheduleSummary: async () => {
-        await getCurrentTab()
-          .then(
-            async tab => {
-              const message: SummaryRequest = {
-                type: "summary_request",
-                videoURL: tab!
-              }
-              summaryPort.postMessage(message)
-            }
-          )
-      }
-    }
-  })
+  const updateSummaryState = SummaryContext.useActorRef().send
 
-  const { summary } = state.context
-  const summaryState = (state.value as SummaryState)
+  const { summary, errorMessage, videoId } = SummaryContext.useSelector(state => state.context)
+  const summaryState = (SummaryContext.useSelector(state => state.value) as SummaryState)
 
-  const canSummarize = !!openAIToken && !!videoURL && ["empty", "failed"].includes(summaryState)
+  const canSummarize = !!openAIToken && !!videoURL && ["idle", "failed"].includes(summaryState)
 
-  const messageHandler = (response: ServiceResponse) => {
+  const summaryPortHandler = (response: SummaryResponseMessage) => {
     switch (response.type) {
       case "summary_response":
-        return send({
+        return updateSummaryState({
           type: "SummaryReceived",
           summary: response.summary!!,
           videoId: response.videoId
         })
+      case "error":
+        return updateSummaryState({
+          type: "SummaryFailed",
+          message: response.message
+        })
+    }
+  }
+  const userPortHandler = (response: UserInfoResponseMessage) => {
+    switch (response.type) {
       case "user_info_response":
         const { accumulatedCost: cost } = response
         return setAccumulatedCost(cost)
       case "error":
-        return send({
+        return updateSummaryState({
           type: "SummaryFailed",
           message: response.message
         })
@@ -98,19 +68,21 @@ function App() {
       .then(token => {
         if (token) {
           setOpenAIToken(token)
-          const message: UserInfoRequest = {
+          const message: UserInfoRequestMessage = {
             type: "user_info_request",
           }
-          summaryPort.postMessage(message)
+          userInfoPort.postMessage(message)
         }
       })
 
     getCurrentTab()
       .then(url => { setVideoURL(url) })
 
-    summaryPort.onMessage.addListener(messageHandler);
+    summaryPort.onMessage.addListener(summaryPortHandler);
+    userInfoPort.onMessage.addListener(userPortHandler);
     return () => {
-      summaryPort.onMessage.removeListener(messageHandler)
+      summaryPort.onMessage.removeListener(summaryPortHandler)
+      userInfoPort.onMessage.removeListener(userPortHandler)
     }
 
   }, [])
@@ -132,13 +104,16 @@ function App() {
                 </Button>
               </a>
             ) : <>
-              {!state.context.summary && <Tooltip label={buttonTooltipText}>
+              {!summary && <Tooltip label={buttonTooltipText}>
                 <Button
                   isDisabled={!canSummarize}
                   colorScheme={'green'}
                   onClick={
-                    async e => {
-                      send("Summarize")
+                    async _ => {
+                      updateSummaryState({
+                        type: "Summarize",
+                        videoURL: videoURL!!
+                      })
                     }
                   }
                 >
@@ -172,7 +147,7 @@ function App() {
                 summaryState === "failed" && (
                   <HStack>
                     <WarningIcon />
-                    <Text>{state.context.errorMessage}</Text>
+                    <Text>{errorMessage}</Text>
                   </HStack>
                 )
               }
@@ -181,7 +156,7 @@ function App() {
                   <Divider />
                   <Summary
                     summary={summary}
-                    videoId={state.context.videoId!!}
+                    videoId={videoId!!}
                   />
                 </>
               }
@@ -192,5 +167,3 @@ function App() {
     </main >
   )
 }
-
-export default App

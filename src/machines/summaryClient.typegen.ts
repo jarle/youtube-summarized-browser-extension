@@ -29,6 +29,6 @@ export interface Typegen0 {
     eventsCausingServices: {
 
     };
-    matchesStates: "empty" | "failed" | "loading" | "summarized";
+    matchesStates: "failed" | "idle" | "loading" | "summarized";
     tags: never;
 }

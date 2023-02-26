@@ -1,22 +1,16 @@
+import { SummaryRequestMessage, SummaryResponseMessage } from './messaging/summaryPort';
+import { UserInfoRequestMessage, UserInfoResponseMessage } from './messaging/userInfoPort';
+
 export type TabInfo = {
     url: string,
     tabId: number
 }
 
-export type SummaryState = "empty" | "loading" | "failed" | "summarized"
+export type SummaryState = "idle" | "loading" | "failed" | "summarized"
 
-export type SummaryRequest = {
-    type: "summary_request",
-    videoURL: string
-}
+export type ServiceRequestMessage = UserInfoRequestMessage | SummaryRequestMessage
 
-export type UserInfoRequest = {
-    type: "user_info_request",
-}
-
-export type ServiceRequest = UserInfoRequest | SummaryRequest
-
-export type ErrorResponse = {
+export type ErrorResponseMessage = {
     type: "error",
     message: string
 }
@@ -25,19 +19,7 @@ export type UserInfo = {
     accumulatedCost: string
 }
 
-export type SummaryResponse = {
-    type: "summary_response",
-    videoId: string,
-    preview: string,
-    summary: string | undefined
-}
-
-export type UserInfoResponse = {
-    type: "user_info_response",
-    accumulatedCost: number
-}
-
-export type ServiceResponse = UserInfoResponse | ErrorResponse | SummaryResponse
+export type ServiceResponse = UserInfoResponseMessage | ErrorResponseMessage | SummaryResponseMessage
 
 
 export type Summary = {

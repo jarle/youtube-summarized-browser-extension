@@ -1,6 +1,7 @@
-import { ErrorResponse, ServiceRequest, Summary, SummaryRequest, SummaryResponse, UserInfo, UserInfoResponse } from "../types";
-
-console.info('chrome-ext template-react-ts background script')
+import { UserInfoPort, UserInfoRequestMessage } from '../messaging/userInfoPort';
+import { SummaryPort, SummaryRequestMessage } from './../messaging/summaryPort';
+import { summaryRequestHandler } from "./summaryRequestHandler";
+import { userInfoRequestHandler } from "./userInfoRequestHandler";
 
 const hasStorage = !!chrome.storage?.sync
 
@@ -10,111 +11,23 @@ chrome.runtime?.onInstalled.addListener((details) => {
     }
 });
 
-
-chrome.runtime.onConnect.addListener(port => {
-    port.onMessage?.addListener(async (message: ServiceRequest) => {
-        if (message.type == "summary_request") {
-            const { videoURL } = (message as SummaryRequest)
-            try {
-                const token = await getToken()
-                const result = await getSummary(token!, videoURL)
-                const firstResponse: SummaryResponse = {
-                    type: "summary_response",
-                    videoId: result.videoId,
-                    preview: result.summary,
-                    summary: result.summary
-                }
-                console.debug({ firstResponse })
-                port.postMessage(firstResponse)
-            } catch (error) {
-                const errorResponse: ErrorResponse = {
-                    type: "error",
-                    message: (error as any).message || "Unknown error"
-                }
-                console.debug({ errorResponse })
-                port.postMessage(errorResponse)
-            }
+chrome.runtime.onConnect.addListener(
+    port => {
+        if (port.name === SummaryPort.name) {
+            port.onMessage?.addListener(async (message: SummaryRequestMessage) => {
+                summaryRequestHandler(message, port)
+            })
         }
-        else if (message.type == "user_info_request") {
-            try {
-                const token = await getToken()
-                const result = await getUserInfo(token!)
-                const firstResponse: UserInfoResponse = {
-                    type: "user_info_response",
-                    accumulatedCost: Number.parseFloat(result.accumulatedCost)
-                }
-                console.debug({ firstResponse })
-                port.postMessage(firstResponse)
-            } catch (error) {
-                const errorResponse: ErrorResponse = {
-                    type: "error",
-                    message: (error as any).message || "Unknown error"
-                }
-                console.debug({ errorResponse })
-                port.postMessage(errorResponse)
-            }
+        else if (port.name === UserInfoPort.name) {
+            port.onMessage?.addListener(async (message: UserInfoRequestMessage) => {
+                userInfoRequestHandler(message, port)
+            })
+        }
+        else {
+            console.warn("Unknown port name: " + port.name)
         }
     })
 
-})
-
-const API_GATEWAY_URL = "https://api.youtubesummarized.com"
-
-async function getUserInfo(token: string): Promise<UserInfo> {
-    return fetch(
-        `${API_GATEWAY_URL}/v1/user/info`,
-        {
-            headers: {
-                "openai-token": token,
-                "yt-summarized-request-source": "BROWSER_EXTENSION",
-                "Access-Control-Allow-Origin": API_GATEWAY_URL
-            }
-        }
-    )
-        .then(
-            async res => {
-                const response = await res.json()
-                if (res.status == 200) {
-                    return response
-                }
-                throw Error(`${response.message}`)
-            }
-        )
-        .catch(
-            error => {
-                console.error(error)
-                throw (error)
-            }
-        )
-}
-
-async function getSummary(token: string, videoURL: string): Promise<Summary> {
-    return fetch(
-        `${API_GATEWAY_URL}/v1/youtube/summarizeVideoWithToken?videoURL=${videoURL}`,
-        {
-            headers: {
-                "openai-token": token,
-                "yt-summarized-request-source": "BROWSER_EXTENSION",
-                "Access-Control-Allow-Origin": API_GATEWAY_URL
-            }
-        }
-    )
-        .then(
-            async res => {
-                const response = await res.json()
-                if (res.status == 200) {
-                    return response
-                }
-                throw Error(`${response.message}`)
-            }
-        )
-        .catch(
-            error => {
-                console.error(error)
-                throw (error)
-            }
-        )
-}
 
 const getToken = async (): Promise<string | null> => {
     if (!hasStorage) {
