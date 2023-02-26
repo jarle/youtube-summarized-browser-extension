@@ -4,8 +4,8 @@ import ReactDOM from 'react-dom/client'
 import { getCurrentTab } from '../common/tabHandler'
 import { SummaryRequestMessage } from '../messaging/summaryPort'
 import { ytSummarizedTheme } from '../theme'
+import { Popup } from './components/Popup'
 import { summaryPort } from './messaging'
-import { Popup } from './Popup'
 import { SummaryContext } from './SummaryContext'
 
 function App() {

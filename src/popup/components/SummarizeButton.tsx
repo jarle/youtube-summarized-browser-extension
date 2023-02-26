@@ -1,7 +1,7 @@
 import { Button } from "@chakra-ui/react"
 import { FC } from "react"
-import { SummaryState } from "../types"
-import { SummaryContext } from "./SummaryContext"
+import { SummaryState } from "../../types"
+import { SummaryContext } from "../SummaryContext"
 
 export const SummarizeButton: FC<{ videoURL: string }> = ({ videoURL }) => {
     const summaryState = (SummaryContext.useSelector(state => state.value) as SummaryState)

@@ -1,15 +1,15 @@
 import { ExternalLinkIcon, SettingsIcon, WarningIcon } from '@chakra-ui/icons'
 import { Button, Center, Divider, Heading, HStack, Link, Spinner, Tag, Text, Tooltip, VStack } from '@chakra-ui/react'
 import { useEffect, useState } from 'react'
-import { getCurrentTab } from '../common/tabHandler'
-import { getToken } from '../common/tokenHandler'
-import { SummaryResponseMessage } from '../messaging/summaryPort'
-import { UserInfoRequestMessage, UserInfoResponseMessage } from '../messaging/userInfoPort'
-import { SummaryState } from '../types'
-import { summaryPort, userInfoPort } from './messaging'
+import { getCurrentTab } from '../../common/tabHandler'
+import { getToken } from '../../common/tokenHandler'
+import { SummaryResponseMessage } from '../../messaging/summaryPort'
+import { UserInfoRequestMessage, UserInfoResponseMessage } from '../../messaging/userInfoPort'
+import { SummaryState } from '../../types'
+import { summaryPort, userInfoPort } from '../messaging'
+import { SummaryContext } from '../SummaryContext'
 import { SummarizeButton } from './SummarizeButton'
 import { Summary } from './Summary'
-import { SummaryContext } from './SummaryContext'
 
 const getSummaryButtonTooltext = (summaryState: SummaryState): string => {
   switch (summaryState) {
