@@ -11,19 +11,6 @@ import { popupMachine } from './popupMachine'
 import { SummarizeButton } from './SummarizeButton'
 import { Summary } from './Summary'
 
-const getSummaryButtonTooltext = (summaryState: SummaryState): string => {
-  switch (summaryState) {
-    case "idle":
-      return "Summarize this video using OpenAI tokens"
-    case "loading":
-      return "Generating summary..."
-    case "failed":
-      return "Summary failed"
-    case "summarized":
-      return "Summarized"
-  }
-}
-
 export function Popup() {
   const updateSummaryState = SummaryContext.useActorRef().send
 
@@ -39,6 +26,20 @@ export function Popup() {
   })
   const { videoURL, openAIToken, userInfo } = popupState.context
   const { accumulatedCost } = userInfo || { accumulatedCost: 0 }
+
+  const getSummaryButtonTooltext = (): string => {
+    switch (summaryState) {
+      case "idle":
+        return "Summarize this video using OpenAI tokens"
+      case "loading":
+        return "Generating summary..."
+      case "failed":
+        return "Summary failed"
+      case "summarized":
+        return "Summarized"
+    }
+  }
+
 
   const summaryPortHandler = (response: SummaryResponseMessage) => {
     switch (response.type) {
@@ -80,9 +81,9 @@ export function Popup() {
       userInfoPort.onMessage.removeListener(userPortHandler)
     }
 
-  }, [openAIToken])
+  }, [])
 
-  const buttonTooltipText = videoURL && getSummaryButtonTooltext(summaryState) || "Find a video on youtube.com to summarize videos"
+  const buttonTooltipText = videoURL && getSummaryButtonTooltext() || "Find a video on youtube.com to summarize videos"
   const state = popupState.value
 
   return (

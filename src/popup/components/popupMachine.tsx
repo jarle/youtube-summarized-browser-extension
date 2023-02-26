@@ -99,7 +99,12 @@ export const popupMachine =
 
             "Fetching userInfo": {
                 on: {
-                    "Userinfo received": "Initialized"
+                    "Userinfo received": {
+                        target: "Initialized",
+                        actions: assign({
+                            userInfo: (ctx, evt) => evt.userInfo
+                        })
+                    }
                 },
                 entry: "fetchUserInfo",
             }
