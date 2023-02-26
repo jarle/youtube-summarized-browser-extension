@@ -4,18 +4,17 @@ import { useMachine } from '@xstate/react'
 import { useEffect } from 'react'
 import { SummaryResponseMessage } from '../../messaging/summaryPort'
 import { UserInfoRequestMessage, UserInfoResponseMessage } from '../../messaging/userInfoPort'
-import { SummaryState } from '../../types'
 import { summaryPort, userInfoPort } from '../messaging'
 import { SummaryContext } from '../SummaryContext'
 import { popupMachine } from './popupMachine'
-import { SummarizeButton } from './SummarizeButton'
 import { Summary } from './Summary'
 
 export function Popup() {
-  const updateSummaryState = SummaryContext.useActorRef().send
+  const summaryActor = SummaryContext.useActorRef()
+  const updateSummaryState = summaryActor.send
 
   const { summary, errorMessage, videoId } = SummaryContext.useSelector(state => state.context)
-  const summaryState = (SummaryContext.useSelector(state => state.value) as SummaryState)
+  const summaryState = (SummaryContext.useSelector(state => state))
 
   const [popupState, updatePopupState] = useMachine(popupMachine, {
     actions: {
@@ -27,16 +26,18 @@ export function Popup() {
   const { videoURL, openAIToken, userInfo } = popupState.context
   const { accumulatedCost } = userInfo || { accumulatedCost: 0 }
 
-  const getSummaryButtonTooltext = (): string => {
-    switch (summaryState) {
-      case "idle":
-        return "Summarize this video using OpenAI tokens"
-      case "loading":
-        return "Generating summary..."
-      case "failed":
-        return "Summary failed"
-      case "summarized":
-        return "Summarized"
+  const getSummaryButtonTooltext = (): string | undefined => {
+    if (summaryState.matches("idle")) {
+      return "Summarize this video using OpenAI tokens"
+    }
+    else if (summaryState.matches("loading")) {
+      return "Generating summary..."
+    }
+    else if (summaryState.matches("failed")) {
+      return "Summary failed"
+    }
+    else if (summaryState.matches("summarized")) {
+      return "Summarized"
     }
   }
 
@@ -83,7 +84,7 @@ export function Popup() {
 
   }, [])
 
-  const buttonTooltipText = videoURL && getSummaryButtonTooltext() || "Find a video on youtube.com to summarize videos"
+  const buttonTooltipText = getSummaryButtonTooltext()
   const state = popupState.value
 
   return (
@@ -103,7 +104,22 @@ export function Popup() {
               </a>
             ) : <>
               {!summary && <Tooltip label={buttonTooltipText}>
-                <SummarizeButton videoURL={videoURL!!} />
+                <Button
+                  disabled={
+                    !videoURL || !summaryActor.getSnapshot()?.can({ type: "Summarize", videoURL: videoURL })
+                  }
+                  colorScheme={'green'}
+                  onClick={
+                    async _ => {
+                      summaryActor.send({
+                        type: "Summarize",
+                        videoURL: videoURL!
+                      })
+                    }
+                  }
+                >
+                  Summarize video
+                </Button>
               </Tooltip>
               }
               {
@@ -121,7 +137,7 @@ export function Popup() {
                 ) : null
               }
               {
-                summaryState === "loading" && (
+                summaryState.matches("loading") && (
                   <VStack>
                     <Text>Loading Summary</Text>
                     <Spinner />
@@ -129,7 +145,7 @@ export function Popup() {
                 )
               }
               {
-                summaryState === "failed" && (
+                summaryState.matches("failed") && (
                   <HStack>
                     <WarningIcon />
                     <Text>{errorMessage}</Text>
