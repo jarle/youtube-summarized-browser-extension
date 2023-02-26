@@ -1,7 +1,7 @@
 import { ExternalLinkIcon, SettingsIcon, WarningIcon } from '@chakra-ui/icons'
 import { Button, Center, Divider, Heading, HStack, Link, Spinner, Tag, Text, Tooltip, VStack } from '@chakra-ui/react'
 import { useMachine } from '@xstate/react'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { SummaryResponseMessage } from '../../messaging/summaryPort'
 import { UserInfoRequestMessage, UserInfoResponseMessage } from '../../messaging/userInfoPort'
 import { SummaryState } from '../../types'
@@ -25,15 +25,20 @@ const getSummaryButtonTooltext = (summaryState: SummaryState): string => {
 }
 
 export function Popup() {
-  const [accumulatedCost, setAccumulatedCost] = useState<number | undefined>()
-
   const updateSummaryState = SummaryContext.useActorRef().send
 
   const { summary, errorMessage, videoId } = SummaryContext.useSelector(state => state.context)
   const summaryState = (SummaryContext.useSelector(state => state.value) as SummaryState)
 
-  const [popupState, updatePopupState] = useMachine(popupMachine)
-  const { videoURL, openAIToken } = popupState.context
+  const [popupState, updatePopupState] = useMachine(popupMachine, {
+    actions: {
+      "fetchUserInfo": () => {
+        userInfoPort.postMessage({ type: "user_info_request" } as UserInfoRequestMessage)
+      }
+    }
+  })
+  const { videoURL, openAIToken, userInfo } = popupState.context
+  const { accumulatedCost } = userInfo || { accumulatedCost: 0 }
 
   const summaryPortHandler = (response: SummaryResponseMessage) => {
     switch (response.type) {
@@ -55,8 +60,10 @@ export function Popup() {
   const userPortHandler = (response: UserInfoResponseMessage) => {
     switch (response.type) {
       case "user_info_response":
-        const { accumulatedCost: cost } = response
-        return setAccumulatedCost(cost)
+        return updatePopupState({
+          type: "Userinfo received",
+          userInfo: response.userInfo
+        })
       case "error":
         return updateSummaryState({
           type: "SummaryFailed",
@@ -66,13 +73,6 @@ export function Popup() {
   }
 
   useEffect(() => {
-    if (openAIToken) {
-      const message: UserInfoRequestMessage = {
-        type: "user_info_request",
-      }
-      userInfoPort.postMessage(message)
-    }
-
     summaryPort.onMessage.addListener(summaryPortHandler);
     userInfoPort.onMessage.addListener(userPortHandler);
     return () => {

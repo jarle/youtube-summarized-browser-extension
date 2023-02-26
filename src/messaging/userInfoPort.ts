@@ -1,4 +1,4 @@
-import { ErrorResponseMessage } from "../types"
+import { ErrorResponseMessage, UserInfo } from "../types"
 
 export const UserInfoPort = {
     name: "userInfo"
@@ -10,5 +10,5 @@ export type UserInfoRequestMessage = {
 
 export type UserInfoResponseMessage = ErrorResponseMessage | {
     type: "user_info_response",
-    accumulatedCost: number
+    userInfo: UserInfo
 }

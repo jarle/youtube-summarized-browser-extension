@@ -1,8 +1,9 @@
-import { Summary, UserInfo } from "../types"
+import { Summary } from "../types";
+import { APIUserInfo } from './../types';
 
 const API_GATEWAY_URL = "https://api.youtubesummarized.com"
 
-export async function getUserInfo(token: string): Promise<UserInfo> {
+export async function getUserInfo(token: string): Promise<APIUserInfo> {
     return fetch(
         `${API_GATEWAY_URL}/v1/user/info`,
         {

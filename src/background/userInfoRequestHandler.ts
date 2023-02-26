@@ -8,12 +8,14 @@ export const userInfoRequestHandler = async (message: UserInfoRequestMessage, po
         try {
             const token = await getToken()
             const result = await getUserInfo(token!)
-            const firstResponse: UserInfoResponseMessage = {
+            const userInfoResponse: UserInfoResponseMessage = {
                 type: "user_info_response",
-                accumulatedCost: Number.parseFloat(result.accumulatedCost)
+                userInfo: {
+                    accumulatedCost: Number.parseFloat(result.accumulatedCost)
+                }
             }
-            console.debug({ firstResponse })
-            port.postMessage(firstResponse)
+            console.debug({ userInfoResponse })
+            port.postMessage(userInfoResponse)
         } catch (error) {
             const errorResponse: ErrorResponseMessage = {
                 type: "error",

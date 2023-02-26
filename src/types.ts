@@ -15,8 +15,12 @@ export type ErrorResponseMessage = {
     message: string
 }
 
-export type UserInfo = {
+export type APIUserInfo = {
     accumulatedCost: string
+}
+
+export type UserInfo = {
+    accumulatedCost: number
 }
 
 export type ServiceResponse = UserInfoResponseMessage | ErrorResponseMessage | SummaryResponseMessage
