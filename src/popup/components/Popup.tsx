@@ -5,7 +5,7 @@ import { useEffect } from 'react'
 import { SummaryResponseMessage } from '../../messaging/summaryPort'
 import { UserInfoRequestMessage, UserInfoResponseMessage } from '../../messaging/userInfoPort'
 import { summaryPort, userInfoPort } from '../messaging'
-import { SummaryContext } from '../SummaryContext'
+import { SummaryContext } from '../state'
 import { popupMachine } from './popupMachine'
 import { Summary } from './Summary'
 

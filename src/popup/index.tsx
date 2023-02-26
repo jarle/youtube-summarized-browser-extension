@@ -7,7 +7,7 @@ import { SummaryRequestMessage } from '../messaging/summaryPort'
 import { ytSummarizedTheme } from '../theme'
 import { Popup } from './components/Popup'
 import { summaryPort } from './messaging'
-import { SummaryContext } from './SummaryContext'
+import { SummaryContext } from './state'
 
 function App() {
   const scheduleSummary = async () => {
@@ -31,7 +31,6 @@ function App() {
           if (!openAIToken) {
             throw new Error("No OpenAI token found")
           }
-
           return {
             openAIToken
           }

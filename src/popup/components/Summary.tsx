@@ -2,7 +2,7 @@ import { ExternalLinkIcon } from "@chakra-ui/icons"
 import { Box, Center, HStack, Text } from "@chakra-ui/react"
 import ChakraUIRenderer from "chakra-ui-markdown-renderer"
 import ReactMarkdown from "react-markdown"
-import { SummaryContext } from "../SummaryContext"
+import { SummaryContext } from "../state"
 
 export const Summary = () => {
     const [state] = SummaryContext.useActor()
