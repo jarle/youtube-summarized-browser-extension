@@ -23,7 +23,7 @@ export function Popup() {
       }
     }
   })
-  const { videoURL, openAIToken, userInfo } = popupState.context
+  const { videoURL, userInfo } = popupState.context
   const { accumulatedCost } = userInfo || { accumulatedCost: 0 }
 
   const getSummaryButtonTooltext = (): string | undefined => {
@@ -96,7 +96,7 @@ export function Popup() {
             <Heading>YouTube Summarized</Heading>
           </HStack>
           {
-            !openAIToken ? (
+            summaryState.matches("No token") ? (
               <a onClick={() => chrome.runtime.openOptionsPage()}>
                 <Button leftIcon={<SettingsIcon />} rightIcon={<ExternalLinkIcon />}>
                   Start using the extension by entering an OpenAI key in the settings

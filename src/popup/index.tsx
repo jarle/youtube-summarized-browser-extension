@@ -2,6 +2,7 @@ import { ChakraProvider } from '@chakra-ui/react'
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { getCurrentTab } from '../common/tabHandler'
+import { getToken } from '../common/tokenHandler'
 import { SummaryRequestMessage } from '../messaging/summaryPort'
 import { ytSummarizedTheme } from '../theme'
 import { Popup } from './components/Popup'
@@ -23,14 +24,27 @@ function App() {
   }
   return (
     <SummaryContext.Provider options={{
-      actions: { scheduleSummary }
+      actions: { scheduleSummary },
+      services: {
+        getToken: async () => {
+          const openAIToken = await getToken()
+          if (!openAIToken) {
+            throw new Error("No OpenAI token found")
+          }
+
+          return {
+            openAIToken
+          }
+
+        }
+      }
     }}>
       <React.StrictMode>
         <ChakraProvider theme={ytSummarizedTheme}>
           <Popup />
         </ChakraProvider>
       </React.StrictMode>
-    </SummaryContext.Provider>
+    </SummaryContext.Provider >
   )
 }
 
