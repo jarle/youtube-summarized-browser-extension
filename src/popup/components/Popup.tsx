@@ -122,7 +122,7 @@ export function Popup() {
               </Tooltip>
               }
               {
-                accumulatedCost ? (
+                popupState.matches("Initialized") ? (
                   <Tooltip label="Your accumulated cost for generated summaries this month, excluding local tax. See openai.com for more details.">
                     <Link href="https://platform.openai.com/account/usage" target={"_blank"}>
                       <HStack>
