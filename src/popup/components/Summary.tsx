@@ -1,13 +1,14 @@
 import { ExternalLinkIcon } from "@chakra-ui/icons"
 import { Box, Center, HStack, Text } from "@chakra-ui/react"
 import ChakraUIRenderer from "chakra-ui-markdown-renderer"
-import { FC } from "react"
 import ReactMarkdown from "react-markdown"
+import { SummaryContext } from "../SummaryContext"
 
-export const Summary: FC<{
-    summary: string,
-    videoId: string
-}> = ({ videoId, summary }) => {
+export const Summary = () => {
+    const [state] = SummaryContext.useActor()
+    const { summary, videoId } = state.context
+    if (!summary || !videoId) return null
+
     return (
         <Box alignContent={'left'} padding={'3em'}>
             <Center>

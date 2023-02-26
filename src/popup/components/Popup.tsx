@@ -13,7 +13,7 @@ export function Popup() {
   const summaryActor = SummaryContext.useActorRef()
   const updateSummaryState = summaryActor.send
 
-  const { summary, errorMessage, videoId } = SummaryContext.useSelector(state => state.context)
+  const { errorMessage } = SummaryContext.useSelector(state => state.context)
   const summaryState = (SummaryContext.useSelector(state => state))
 
   const [popupState, updatePopupState] = useMachine(popupMachine, {
@@ -85,13 +85,11 @@ export function Popup() {
   }, [])
 
   const buttonTooltipText = getSummaryButtonTooltext()
-  const state = popupState.value
 
   return (
     <main>
       <Center padding={5}>
         <VStack w={'50em'} spacing={'1.5em'}>
-          <pre>{JSON.stringify(state)}</pre>
           <HStack>
             <Heading>YouTube Summarized</Heading>
           </HStack>
@@ -103,14 +101,15 @@ export function Popup() {
                 </Button>
               </a>
             ) : <>
-              {!summary && <Tooltip label={buttonTooltipText}>
+              {!popupState.matches("Initialized.Complete") && <Tooltip label={buttonTooltipText}>
                 <Button
-                  disabled={
-                    !videoURL || !summaryActor.getSnapshot()?.can({ type: "Summarize", videoURL: videoURL })
+                  isDisabled={
+                    !popupState.can("Trigger summary")
                   }
                   colorScheme={'green'}
                   onClick={
                     async _ => {
+                      updatePopupState('Trigger summary')
                       summaryActor.send({
                         type: "Summarize",
                         videoURL: videoURL!
@@ -153,12 +152,9 @@ export function Popup() {
                 )
               }
               {
-                summary && <>
+                popupState.matches("Initialized.Complete") && <>
                   <Divider />
-                  <Summary
-                    summary={summary}
-                    videoId={videoId!!}
-                  />
+                  <Summary />
                 </>
               }
             </>
