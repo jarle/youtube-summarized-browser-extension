@@ -3,8 +3,7 @@ import { Button, Center, Divider, Heading, HStack, Link, Spinner, Tag, Text, Too
 import { useMachine } from '@xstate/react'
 import { useEffect } from 'react'
 import { SummaryResponseMessage } from '../../messaging/summaryPort'
-import { UserInfoRequestMessage } from '../../messaging/userInfoPort'
-import { summaryPort, userInfoPort } from '../messaging'
+import { summaryPort } from '../messaging'
 import { SummaryContext, UserInfoContext } from '../state'
 import { popupMachine } from './popupMachine'
 import { Summary } from './Summary'
@@ -17,13 +16,7 @@ export function Popup() {
   const { errorMessage } = SummaryContext.useSelector(state => state.context)
   const summaryState = (SummaryContext.useSelector(state => state))
 
-  const [popupState, updatePopupState] = useMachine(popupMachine, {
-    actions: {
-      "fetchUserInfo": () => {
-        userInfoPort.postMessage({ type: "user_info_request" } as UserInfoRequestMessage)
-      }
-    }
-  })
+  const [popupState, updatePopupState] = useMachine(popupMachine)
   const { videoURL } = popupState.context
   const { userInfo } = userState.context
   const accumulatedCost = userInfo?.accumulatedCost
