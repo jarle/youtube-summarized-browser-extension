@@ -9,7 +9,7 @@ export interface Typegen0 {
     };
     invokeSrcNameMap: {
         "getToken": "done.invoke.userInfoClient.idle:invocation[0]";
-        "getUserInfo": "done.invoke.userInfoClient.Loadingg:invocation[0]";
+        "getUserInfo": "done.invoke.userInfoClient.Loading:invocation[0]";
     };
     missingImplementations: {
         actions: never;
@@ -31,6 +31,6 @@ export interface Typegen0 {
         "getToken": "xstate.init";
         "getUserInfo": "done.invoke.userInfoClient.idle:invocation[0]";
     };
-    matchesStates: "Done" | "Loadingg" | "No token" | "idle";
+    matchesStates: "Done" | "Loading" | "No token" | "idle";
     tags: never;
 }

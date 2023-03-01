@@ -15,7 +15,7 @@ export const getTokenService = async () => {
 }
 
 export const userInfoClient =
-    /** @xstate-layout N4IgpgJg5mDOIC5QFdZgE4EkB2AzA9gMIA2AlmNgC4B0pExYAxBPtmLdgG74DW7qGHARLkqtemASku+AMYBDSqVYBtAAwBddRsSgADvliklrXSAAeiAEwBGagBYArADZ7ATjfOA7Fa9ubAMyOVgA0IACeiAC0XmrUbmpeABz+zo7B9ikAvllhAlh4RGQUNAAy+PIQ0lBQjADKyLKycLDaZgZGJthmlgjBAfFWnklejmGRCDFWDokpNmkZ2bkg+UJFojR0DIwY6Pjo1HrEigToALbUq4UiJeIMUjIKXdptSCAdxsrdb7329tTOBIjezeXz+ILjRA2Lx2ZzONSBP5uLx+Zw2HLLbD4CBwMxXYTFKjtQyfUw-aJWZzURz2IJqNQBXxWNRJVxJSGTGyONzxWapdJWTJuHJ5NAFAkbO5gYmdL49RABOKORJWJJqNxWMGIsYRRDOaZeNGAwHI1E2dHLfHrW7lSrVKAy0nfUC-FzUFLONVeJwBP5qZwcjXUQK+JJDAIwgI2Nz2EUrMVrG5iABy+AABJReBRHV15Qh7F5qJSUh5QX5AjqJr5-lYAglDZ5AnC-nGrUmaAARVjSt4fXPkhCjWFJLkZGko-wcpKOIvuNzAtS09VqRwYrJAA */
+    /** @xstate-layout N4IgpgJg5mDOIC5QFdZgE4EkB2AzA9gMIA2AlmNgC4B0pExYAxBPtmLdgG74DW7qGHARLkqtemASku+AMYBDSqVYBtAAwBddRsSgADvliklrXSAAeiAEwBGagBYArADZ7ATjfOA7Fa9ubAMyOVgA0IACeiAC0XmrUbmpeABz+zo7B9ikAvllhAlh4RGQUNAAy+PIQ0lCMAMrIsrJwsNpmBkYm2GaWCMEB8VaeSV6OYZEIMVYOiSk2aRnZuSD5QkWiNHQMjBjo+OjUesSKBOgAttQrhSIl4gxSMgqd2q1IIO3Gyl2vPfb21M4JYb2by+fxBMaIGxeOzOZxqQK-NxePzOGw5JbYfAQOBmS7CYpUNqGD6mb7RKzOaiOexBNRqAK+KxqJKuJIQiY2RxueIzVLpKyZNw5PJoAr49a3MBEjqfbqIAJxRyJKxJNRuKyghGjCKIZxTLyogEApEomxopZ4tY3cqVarSklfUA-FzUFLOVVeJwBX5qZzs9XUQK+JKDALQgI2Nz2YXLUWra5iABy+AABJReBR7Z05Qh7F5qBSUh4QX5Atrxr4-lYAgkDZ5ArDfjHLQmaAARVhS17vbNkhAjGFJTkZanI-zspKOAvuNxAtQ0tVqRzorJAA */
     createMachine({
         id: "userInfoClient",
         tsTypes: {} as import("./userInfoClient.typegen").Typegen0,
@@ -48,7 +48,7 @@ export const userInfoClient =
                     src: "getToken",
 
                     onDone: {
-                        target: "Loadingg",
+                        target: "Loading",
                         actions: "assignTokenToContext"
                     },
 
@@ -56,7 +56,7 @@ export const userInfoClient =
                 },
             },
 
-            Loadingg: {
+            Loading: {
                 invoke: {
                     src: "getUserInfo",
                 },
