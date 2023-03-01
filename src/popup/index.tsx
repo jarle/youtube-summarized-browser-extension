@@ -4,9 +4,10 @@ import ReactDOM from 'react-dom/client'
 import { getCurrentTab } from '../common/tabHandler'
 import { getToken } from '../common/tokenHandler'
 import { SummaryRequestMessage } from '../messaging/summaryPort'
+import { UserInfoRequestMessage, UserInfoResponseMessage } from '../messaging/userInfoPort'
 import { ytSummarizedTheme } from '../theme'
 import { Popup } from './components/Popup'
-import { summaryPort } from './messaging'
+import { summaryPort, userInfoPort } from './messaging'
 import { SummaryContext, UserInfoContext } from './state'
 
 const getTokenService = async () => {
@@ -42,10 +43,24 @@ function App() {
       }}>
         <UserInfoContext.Provider options={{
           services: {
-            getToken: getTokenService
+            getToken: getTokenService,
+            getUserInfo: () => (callback, onReceive) => {
+              const handler = (response: UserInfoResponseMessage) => {
+                if (response.type === "user_info_response") {
+                  callback({
+                    type: "Success",
+                    userInfo: response.userInfo
+                  })
+                }
+              }
+
+              userInfoPort.onMessage.addListener(handler);
+              userInfoPort.postMessage({ type: "user_info_request" } as UserInfoRequestMessage)
+              return () => userInfoPort.onMessage.removeListener(handler)
+            }
           },
           guards: {
-            hasToken: (ctx, evt) => !!ctx.openAIToken
+            hasToken: () => true
           }
         }}>
           <ChakraProvider theme={ytSummarizedTheme}>

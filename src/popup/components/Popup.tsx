@@ -5,13 +5,15 @@ import { useEffect } from 'react'
 import { SummaryResponseMessage } from '../../messaging/summaryPort'
 import { UserInfoRequestMessage, UserInfoResponseMessage } from '../../messaging/userInfoPort'
 import { summaryPort, userInfoPort } from '../messaging'
-import { SummaryContext } from '../state'
+import { SummaryContext, UserInfoContext } from '../state'
 import { popupMachine } from './popupMachine'
 import { Summary } from './Summary'
 
 export function Popup() {
   const summaryActor = SummaryContext.useActorRef()
   const updateSummaryState = summaryActor.send
+  const userState = UserInfoContext.useSelector(state => state)
+  // alert(JSON.stringify(userState.context.userInfo))
 
   const { errorMessage } = SummaryContext.useSelector(state => state.context)
   const summaryState = (SummaryContext.useSelector(state => state))
@@ -23,8 +25,9 @@ export function Popup() {
       }
     }
   })
-  const { videoURL, userInfo } = popupState.context
-  const { accumulatedCost } = userInfo || { accumulatedCost: 0 }
+  const { videoURL } = popupState.context
+  const { userInfo } = userState.context
+  const accumulatedCost = userInfo?.accumulatedCost
 
   const getSummaryButtonTooltext = (): string | undefined => {
     if (summaryState.matches("idle")) {
@@ -90,6 +93,8 @@ export function Popup() {
     <main>
       <Center padding={5}>
         <VStack w={'50em'} spacing={'1.5em'}>
+          <pre>{JSON.stringify(userState.value)}</pre>
+          <pre>{JSON.stringify(userState.context)}</pre>
           <HStack>
             <Heading>YouTube Summarized</Heading>
           </HStack>
@@ -127,7 +132,7 @@ export function Popup() {
                     <Link href="https://platform.openai.com/account/usage" target={"_blank"}>
                       <HStack>
                         <Tag>
-                          <Text>{`$${accumulatedCost.toFixed(2)}`}</Text>
+                          <Text>{`$${accumulatedCost?.toFixed(2) || "unknown"}`}</Text>
                         </Tag>
                         <ExternalLinkIcon />
                       </HStack>
