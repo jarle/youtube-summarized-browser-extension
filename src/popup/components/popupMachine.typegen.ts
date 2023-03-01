@@ -11,13 +11,13 @@ export interface Typegen0 {
 
     };
     missingImplementations: {
-        actions: "fetchUserInfo";
+        actions: never;
         delays: never;
         guards: never;
         services: never;
     };
     eventsCausingActions: {
-        "fetchUserInfo": "";
+
     };
     eventsCausingDelays: {
 
@@ -29,6 +29,6 @@ export interface Typegen0 {
     eventsCausingServices: {
 
     };
-    matchesStates: "Data loaded" | "Fetching userInfo" | "Initialized" | "Initialized.Complete" | "Initialized.Failed" | "Initialized.Idle" | "Initialized.Loading" | "No token present" | "No video present" | "Not loaded" | { "Initialized"?: "Complete" | "Failed" | "Idle" | "Loading"; };
+    matchesStates: "Data loaded" | "Initialized" | "Initialized.Complete" | "Initialized.Failed" | "Initialized.Idle" | "Initialized.Loading" | "No token present" | "No video present" | "Not loaded" | { "Initialized"?: "Complete" | "Failed" | "Idle" | "Loading"; };
     tags: never;
 }

@@ -3,7 +3,7 @@ import { Button, Center, Divider, Heading, HStack, Link, Spinner, Tag, Text, Too
 import { useMachine } from '@xstate/react'
 import { useEffect } from 'react'
 import { SummaryResponseMessage } from '../../messaging/summaryPort'
-import { UserInfoRequestMessage, UserInfoResponseMessage } from '../../messaging/userInfoPort'
+import { UserInfoRequestMessage } from '../../messaging/userInfoPort'
 import { summaryPort, userInfoPort } from '../messaging'
 import { SummaryContext, UserInfoContext } from '../state'
 import { popupMachine } from './popupMachine'
@@ -13,7 +13,6 @@ export function Popup() {
   const summaryActor = SummaryContext.useActorRef()
   const updateSummaryState = summaryActor.send
   const userState = UserInfoContext.useSelector(state => state)
-  // alert(JSON.stringify(userState.context.userInfo))
 
   const { errorMessage } = SummaryContext.useSelector(state => state.context)
   const summaryState = (SummaryContext.useSelector(state => state))
@@ -62,27 +61,11 @@ export function Popup() {
         })
     }
   }
-  const userPortHandler = (response: UserInfoResponseMessage) => {
-    switch (response.type) {
-      case "user_info_response":
-        return updatePopupState({
-          type: "Userinfo received",
-          userInfo: response.userInfo
-        })
-      case "error":
-        return updateSummaryState({
-          type: "SummaryFailed",
-          message: response.message
-        })
-    }
-  }
 
   useEffect(() => {
     summaryPort.onMessage.addListener(summaryPortHandler);
-    userInfoPort.onMessage.addListener(userPortHandler);
     return () => {
       summaryPort.onMessage.removeListener(summaryPortHandler)
-      userInfoPort.onMessage.removeListener(userPortHandler)
     }
 
   }, [])
