@@ -15,7 +15,7 @@ export interface Typegen0 {
         actions: never;
         delays: never;
         guards: never;
-        services: "getToken" | "getUserInfo";
+        services: never;
     };
     eventsCausingActions: {
         "assignTokenToContext": "done.invoke.userInfoClient.idle:invocation[0]";
