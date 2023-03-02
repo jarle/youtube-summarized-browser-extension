@@ -19,6 +19,7 @@
 *.log
 
 *.zip
+*.typegen.ts
 
 # secrets
 secrets.*.js

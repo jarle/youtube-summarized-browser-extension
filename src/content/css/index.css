@@ -1,0 +1,75 @@
+.yt-summarized .container {
+    line-height: 1.5;
+    color: #333;
+    height: 70vh;
+    overflow: auto;
+    background-color: rgb(242, 242, 242);
+    padding: 1rem 3rem;
+    border-radius: 12px;
+    font-size: medium;
+}
+
+.yt-summarized button {
+    margin-right: 8px;
+}
+
+.yt-summarized h1,
+.yt-summarized h2,
+.yt-summarized h3,
+.yt-summarized h4,
+.yt-summarized h5,
+.yt-summarized h6 {
+    font-weight: 700;
+    color: #333;
+    line-height: 1.2;
+    margin-bottom: 1rem;
+    margin-top: 3rem;
+}
+
+.yt-summarized h2 {
+    font-size: 2rem;
+}
+
+.yt-summarized h3 {
+    font-size: 1.5rem;
+}
+
+.yt-summarized ol,
+.yt-summarized ul {
+    list-style: disc;
+}
+
+.yt-summarized li {
+    margin-bottom: 0.5rem;
+}
+
+.yt-summarized p {
+    margin-bottom: 1.5rem;
+}
+
+.yt-summarized a {
+    color: #065fd4;
+    text-decoration: none;
+    border-bottom: 2px solid #065fd4;
+}
+
+.yt-summarized a:hover {
+    color: #005580;
+    border-bottom-color: #005580;
+}
+
+.yt-summarized blockquote {
+    margin: 0;
+    padding: 1rem;
+    background-color: #f9f9f9;
+    border-left: 4px solid #0077cc;
+    font-style: italic;
+    font-size: 1.25rem;
+}
+
+.yt-summarized code {
+    font-size: 1.1rem;
+    background-color: #f5f5f5;
+    padding: 0.2rem 0.4rem;
+    border-radius: 0.2rem;
+}

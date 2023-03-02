@@ -1,36 +1,15 @@
 import { ChakraProvider } from '@chakra-ui/react'
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import { getCurrentTab } from '../common/tabHandler'
-import { getTokenService } from '../machines/userInfoClient'
-import { SummaryRequestMessage } from '../messaging/summaryPort'
+import { SummaryContext, UserInfoContext } from '../common/state'
 import { ytSummarizedTheme } from '../theme'
 import { Popup } from './components/Popup'
-import { summaryPort } from './messaging'
-import { SummaryContext, UserInfoContext } from './state'
 
 
 function App() {
-  const scheduleSummary = async () => {
-    await getCurrentTab()
-      .then(
-        async tab => {
-          const message: SummaryRequestMessage = {
-            type: "summary_request",
-            videoURL: tab!
-          }
-          summaryPort.postMessage(message)
-        }
-      )
-  }
   return (
     <React.StrictMode>
-      <SummaryContext.Provider options={{
-        actions: { scheduleSummary },
-        services: {
-          getToken: getTokenService
-        }
-      }}>
+      <SummaryContext.Provider>
         <UserInfoContext.Provider>
           <ChakraProvider theme={ytSummarizedTheme}>
             <Popup />

@@ -23,7 +23,7 @@ export default defineManifest({
         "*://youtube.com/*",
         "*://www.youtube.com/*"
       ],
-      js: ['src/content/index.ts'],
+      js: ['src/content/index.tsx'],
     },
   ],
   host_permissions: [

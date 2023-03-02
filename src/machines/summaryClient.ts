@@ -1,4 +1,8 @@
 import { assign, createMachine } from 'xstate';
+import { getCurrentTab } from '../common/tabHandler';
+import { SummaryRequestMessage, SummaryResponseMessage } from '../messaging/summaryPort';
+import { summaryPort } from '../popup/messaging';
+import { getTokenService } from './userInfoClient';
 
 type EventType = { type: "Summarize", videoURL: string }
     | { type: "SummaryReceived", summary: string, videoId: string }
@@ -23,6 +27,12 @@ export const summaryClient =
                     data: {
                         openAIToken: string
                     },
+                },
+                getSummary: {
+                    data: {
+                        summary: string,
+                        videoId: string
+                    }
                 }
             },
             context: {} as {
@@ -38,7 +48,6 @@ export const summaryClient =
                 on: {
                     "Summarize": {
                         target: "loading",
-                        actions: "scheduleSummary",
                         cond: {
                             predicate: (_, event) => Boolean(event.videoURL),
                             type: 'xstate.guard',
@@ -49,6 +58,9 @@ export const summaryClient =
             },
 
             "loading": {
+                invoke: {
+                    src: "getSummary",
+                },
                 on: {
                     "SummaryReceived": {
                         target: "summarized",
@@ -108,6 +120,46 @@ export const summaryClient =
             }),
             assignTokenToContext: assign({
                 openAIToken: (_, event) => event.data.openAIToken
-            })
-        }
+            }),
+            scheduleSummary: async () => {
+                await getCurrentTab()
+                    .then(
+                        async tab => {
+                            const message: SummaryRequestMessage = {
+                                type: "summary_request",
+                                videoURL: tab!
+                            }
+                            summaryPort.postMessage(message)
+                        }
+                    )
+
+            }
+        },
+        services: {
+            getToken: getTokenService,
+            getSummary: (context, event) => (callback, onReceive) => {
+                const summaryPortHandler = (response: SummaryResponseMessage) => {
+                    switch (response.type) {
+                        case "summary_response":
+                            return callback({
+                                type: "SummaryReceived",
+                                summary: response.summary!!,
+                                videoId: response.videoId
+                            })
+                        case "error":
+                            return callback({
+                                type: "SummaryFailed",
+                                message: response.message
+                            })
+                    }
+                }
+                summaryPort.onMessage.addListener(summaryPortHandler)
+                const message: SummaryRequestMessage = {
+                    type: "summary_request",
+                    videoURL: event.videoURL
+                }
+                summaryPort.postMessage(message)
+                return () => summaryPort.onMessage.removeListener(summaryPortHandler)
+            }
+        },
     })
