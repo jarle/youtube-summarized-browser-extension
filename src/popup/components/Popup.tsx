@@ -22,7 +22,10 @@ export function Popup() {
   const accumulatedCost = userInfo?.accumulatedCost
 
   const getSummaryButtonTooltext = (): string | undefined => {
-    if (summaryState.matches("idle")) {
+    if (popupState.matches("No video present")) {
+      return "Find a video on YouTube.com to summarize first"
+    }
+    else if (summaryState.matches("idle")) {
       return "Summarize this video using OpenAI tokens"
     }
     else if (summaryState.matches("loading")) {
@@ -69,8 +72,6 @@ export function Popup() {
     <main>
       <Center padding={5}>
         <VStack w={'50em'} spacing={'1.5em'}>
-          <pre>{JSON.stringify(userState.value)}</pre>
-          <pre>{JSON.stringify(userState.context)}</pre>
           <HStack>
             <Heading>YouTube Summarized</Heading>
           </HStack>
@@ -82,7 +83,10 @@ export function Popup() {
                 </Button>
               </a>
             ) : <>
-              {!popupState.matches("Initialized.Complete") && <Tooltip label={buttonTooltipText}>
+              {popupState.matches("No video present") ? (
+                <Text>Go to <Link href='https://youtube.com' target={"_blank"}>YouTube.com</Link> to summarize a video.</Text>)
+                : null}
+              {popupState.matches("Initialized") && !popupState.matches("Initialized.Complete") && <Tooltip label={buttonTooltipText}>
                 <Button
                   isDisabled={
                     !popupState.can("Trigger summary")
@@ -103,7 +107,7 @@ export function Popup() {
               </Tooltip>
               }
               {
-                popupState.matches("Initialized") ? (
+                userState.matches("Done") ? (
                   <Tooltip label="Your accumulated cost for generated summaries this month, excluding local tax. See openai.com for more details.">
                     <Link href="https://platform.openai.com/account/usage" target={"_blank"}>
                       <HStack>
