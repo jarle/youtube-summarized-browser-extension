@@ -1,5 +1,4 @@
 import { assign, createMachine } from 'xstate';
-import { getCurrentTab } from '../common/tabHandler';
 import { SummaryRequestMessage, SummaryResponseMessage } from '../messaging/summaryPort';
 import { summaryPort } from '../popup/messaging';
 import { getTokenService } from './userInfoClient';
@@ -77,7 +76,6 @@ export const summaryClient =
                 on: {
                     "Summarize": {
                         target: "loading",
-                        actions: "scheduleSummary"
                     }
                 },
                 exit: () => {
@@ -121,19 +119,6 @@ export const summaryClient =
             assignTokenToContext: assign({
                 openAIToken: (_, event) => event.data.openAIToken
             }),
-            scheduleSummary: async () => {
-                await getCurrentTab()
-                    .then(
-                        async tab => {
-                            const message: SummaryRequestMessage = {
-                                type: "summary_request",
-                                videoURL: tab!
-                            }
-                            summaryPort.postMessage(message)
-                        }
-                    )
-
-            }
         },
         services: {
             getToken: getTokenService,

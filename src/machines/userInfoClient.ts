@@ -67,11 +67,9 @@ export const userInfoClient =
                     }
                 }
             },
-
             "No token": {
                 type: "final"
             },
-
             Done: {
                 type: "final"
             }

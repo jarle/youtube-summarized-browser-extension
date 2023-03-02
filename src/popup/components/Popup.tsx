@@ -1,16 +1,12 @@
 import { ExternalLinkIcon, SettingsIcon, WarningIcon } from '@chakra-ui/icons'
 import { Button, Center, Divider, Heading, HStack, Link, Spinner, Tag, Text, Tooltip, VStack } from '@chakra-ui/react'
 import { useMachine } from '@xstate/react'
-import { useEffect } from 'react'
 import { SummaryContext, UserInfoContext } from '../../common/state'
-import { SummaryResponseMessage } from '../../messaging/summaryPort'
-import { summaryPort } from '../messaging'
 import { popupMachine } from './popupMachine'
 import { Summary } from './Summary'
 
 export function Popup() {
   const summaryActor = SummaryContext.useActorRef()
-  const updateSummaryState = summaryActor.send
   const userState = UserInfoContext.useSelector(state => state)
 
   const { errorMessage } = SummaryContext.useSelector(state => state.context)
@@ -38,33 +34,6 @@ export function Popup() {
       return "Summarized"
     }
   }
-
-
-  const summaryPortHandler = (response: SummaryResponseMessage) => {
-    switch (response.type) {
-      case "summary_response":
-        updatePopupState("Success")
-        return updateSummaryState({
-          type: "SummaryReceived",
-          summary: response.summary!!,
-          videoId: response.videoId
-        })
-      case "error":
-        updatePopupState("Error")
-        return updateSummaryState({
-          type: "SummaryFailed",
-          message: response.message
-        })
-    }
-  }
-
-  useEffect(() => {
-    summaryPort.onMessage.addListener(summaryPortHandler);
-    return () => {
-      summaryPort.onMessage.removeListener(summaryPortHandler)
-    }
-
-  }, [])
 
   const buttonTooltipText = getSummaryButtonTooltext()
 
@@ -137,7 +106,7 @@ export function Popup() {
                 )
               }
               {
-                popupState.matches("Initialized.Complete") && <>
+                summaryState.matches("summarized") && <>
                   <Divider />
                   <Summary />
                 </>
