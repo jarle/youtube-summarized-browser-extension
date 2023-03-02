@@ -1,7 +1,7 @@
 import { CheckIcon, ExternalLinkIcon, QuestionIcon } from '@chakra-ui/icons'
 import { Button, Container, FormControl, FormErrorMessage, FormHelperText, FormLabel, Heading, HStack, Image, Input, InputGroup, InputRightElement, Link, Text, Tooltip, VStack } from '@chakra-ui/react'
 import { useEffect, useState } from 'react'
-import { getToken, storeToken } from '../background'
+import { getToken, storeToken } from '../common/tokenHandler'
 
 function App() {
   const [openAIToken, setOpenAIToken] = useState<string>()
