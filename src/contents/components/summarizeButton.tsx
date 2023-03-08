@@ -1,5 +1,5 @@
-import logo from 'data-base64:~assets/outline-logo.svg'
 import type { FC } from "react"
+import logo from 'url:~assets/outline-logo.svg'
 
 type props = {
     onClick: () => void
@@ -14,7 +14,7 @@ export const SummarizeButton: FC<props> = ({ onClick }) => {
             >
                 <div style={{ display: "flex", flexDirection: "column", marginRight: "4px" }}>
                     <img
-                        src={chrome.runtime.getURL(logo)}
+                        src={logo}
                         height="32px"
                         width="32px"
                         className="style-scope yt-icon"

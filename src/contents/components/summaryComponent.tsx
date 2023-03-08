@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
-import { SummaryContext } from "../common/state";
+import { SummaryContext } from "../../common/state";
 import { SpinningLoader } from "./spinningLoader";
 
 export const SummaryComponent = () => {
