@@ -1,8 +1,8 @@
 {
   "name": "youtube-summarized",
-  "displayName": "Youtube summarized",
+  "displayName": "YouTube Summarized",
   "version": "0.0.12",
-  "description": "YouTube Summarized",
+  "description": "YouTube videos summarized by AI",
   "author": "Jarle Mathiesen",
   "packageManager": "yarn@1.22.19",
   "scripts": {
@@ -37,7 +37,12 @@
   },
   "manifest": {
     "host_permissions": [
-      "https://*/*"
+      "*://api.youtubesummarized.com/*",
+      "*://youtube.com/*",
+      "*://www.youtube.com/*"
+    ],
+    "permissions": [
+      "storage"
     ]
   }
 }
