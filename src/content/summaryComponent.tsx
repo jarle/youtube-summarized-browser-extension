@@ -1,11 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { FC, useEffect } from "react";
 import ReactMarkdown from "react-markdown";
 import { SummaryContext } from "../common/state";
 import { SpinningLoader } from "./spinningLoader";
 
-export const SummaryComponent = () => {
-    const [isOpen, setIsOpen] = useState(true)
-
+export const SummaryPanel: FC<{ onPanelClose: () => void }> = ({ onPanelClose }) => {
     const [summaryActor, updateSummaryActor] = SummaryContext.useActor()
 
     const { summary, videoId } = summaryActor.context
@@ -23,23 +21,19 @@ export const SummaryComponent = () => {
         }
     }, [])
 
-    if (!isOpen) {
-        return null
-    }
-
     return (
         <React.StrictMode>
             <>
                 <div className="yt-summarized">
-                    <div>
-                        <button
-                            className="yt-spec-button-shape-next yt-spec-button-shape-next--text yt-spec-button-shape-next--mono yt-spec-button-shape-next--size-m yt-spec-button-shape-next--icon-only-default"
-                            onClick={() => setIsOpen(false)}>
-                            X
-                        </button>
-                    </div>
                     {
                         <div id="summary-container" className={`container style-scope ytd-watch-flexy`}>
+                            <div>
+                                <button
+                                    className="yt-spec-button-shape-next yt-spec-button-shape-next--text yt-spec-button-shape-next--mono yt-spec-button-shape-next--size-m yt-spec-button-shape-next--icon-only-default"
+                                    onClick={() => onPanelClose()}>
+                                    X
+                                </button>
+                            </div>
                             {
                                 summaryActor.matches("loading") ? <div>
                                     Loading summary

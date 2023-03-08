@@ -1,11 +1,11 @@
-import { FC } from "react"
+import { FC } from 'react'
 import logo from '../assets/outline-logo.svg'
 
-type props = {
+type Props = {
     onClick: () => void
 }
 
-export const SummarizeButton: FC<props> = ({ onClick }) => {
+export const SummarizeButton: FC<Props> = ({ onClick }) => {
     return (
         <div id="summary-button" className="yt-summarized">
             <button
