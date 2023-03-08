@@ -3,7 +3,7 @@ import { Button, Container, FormControl, FormErrorMessage, FormHelperText, FormL
 import { useEffect, useState } from 'react'
 import { getToken, storeToken } from '../common/tokenHandler'
 
-function App() {
+function Options() {
   const [openAIToken, setOpenAIToken] = useState<string>()
   useEffect(() => {
     getToken()
@@ -87,4 +87,4 @@ function App() {
   )
 }
 
-export default App
+export default Options

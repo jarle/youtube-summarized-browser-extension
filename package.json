@@ -1,43 +1,44 @@
 {
-  "name": "youtube-summarized-browser-extension",
-  "version": "0.0.11",
+  "name": "youtube-summarized",
+  "displayName": "Youtube summarized",
+  "version": "0.0.12",
+  "description": "YouTube Summarized",
   "author": "Jarle Mathiesen",
-  "description": "Chrome extension for summarizing YouTube videos using AI.",
-  "type": "module",
-  "license": "MIT",
-  "engines": {
-    "node": ">=14.18.0"
-  },
+  "packageManager": "yarn@1.22.19",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc && vite build",
-    "preview": "vite preview",
-    "fmt": "prettier --write '**/*.{tsx,ts,json,css,scss,md}'"
+    "dev": "plasmo dev",
+    "build": "plasmo build",
+    "package": "plasmo package"
   },
   "dependencies": {
-    "@chakra-ui/css-reset": "^2.0.12",
     "@chakra-ui/icons": "^2.0.17",
-    "@chakra-ui/react": "^2.4.9",
-    "@emotion/react": "^11.10.5",
-    "@emotion/styled": "^11.10.5",
-    "@types/chrome": "^0.0.209",
-    "@xstate/react": "^3.1.2",
+    "@chakra-ui/react": "^2.5.1",
+    "@emotion/react": "^11.10.6",
+    "@emotion/styled": "^11.10.6",
+    "@plasmohq/storage": "^1.2.2",
+    "@xstate/react": "^3.2.1",
     "chakra-ui-markdown-renderer": "^4.1.0",
-    "framer-motion": "^8.5.0",
+    "framer-motion": "^10.2.3",
     "is-youtube-url": "^1.0.5",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
+    "plasmo": "0.66.0",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
     "react-markdown": "^8.0.5",
     "remark-gfm": "^3.0.1",
-    "xstate": "^4.35.4"
+    "xstate": "^4.37.0"
   },
   "devDependencies": {
-    "@crxjs/vite-plugin": "^1.0.12",
-    "@types/react": "^18.0.14",
-    "@types/react-dom": "^18.0.5",
-    "@vitejs/plugin-react": "^1.3.2",
-    "prettier": "^2.7.1",
-    "typescript": "^4.6.4",
-    "vite": "^2.9.13"
+    "@plasmohq/prettier-plugin-sort-imports": "3.6.3",
+    "@types/chrome": "^0.0.210",
+    "@types/node": "18.11.18",
+    "@types/react": "18.0.27",
+    "@types/react-dom": "18.0.10",
+    "prettier": "2.8.3",
+    "typescript": "4.9.4"
+  },
+  "manifest": {
+    "host_permissions": [
+      "https://*/*"
+    ]
   }
 }

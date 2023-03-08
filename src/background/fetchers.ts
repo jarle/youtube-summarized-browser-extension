@@ -1,5 +1,4 @@
-import { APISummary } from "../types";
-import { APIUserInfo } from './../types';
+import type { APISummary, APIUserInfo } from "../types";
 
 const API_GATEWAY_URL = "https://api.youtubesummarized.com"
 

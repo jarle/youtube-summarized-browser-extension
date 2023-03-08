@@ -1,6 +1,4 @@
-import { defineManifest } from '@crxjs/vite-plugin'
-
-export default defineManifest({
+export const manifest = {
   name: 'YouTube Summarized',
   description: 'YouTube videos summarized by AI.',
   version: '0.0.11',
@@ -34,4 +32,4 @@ export default defineManifest({
   permissions: [
     "storage",
   ],
-})
+}

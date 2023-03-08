@@ -1,5 +1,5 @@
+import { SummaryPort, SummaryRequestMessage } from '../messaging/summaryPort';
 import { UserInfoPort, UserInfoRequestMessage } from '../messaging/userInfoPort';
-import { SummaryPort, SummaryRequestMessage } from './../messaging/summaryPort';
 import { summaryRequestHandler } from "./summaryRequestHandler";
 import { userInfoRequestHandler } from "./userInfoRequestHandler";
 

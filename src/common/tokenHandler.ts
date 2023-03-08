@@ -1,23 +1,11 @@
+import { Storage } from "@plasmohq/storage"
 
-const hasStorage = !!chrome.storage?.sync
+const storage = new Storage()
 
 export const getToken = async (): Promise<string | null> => {
-    if (!hasStorage) {
-        if (typeof window !== "undefined") {
-            return window.localStorage.getItem("openapi-token")
-        }
-        return null
-    }
-
-    return chrome.storage.sync.get("openapi-token")
-        .then(data => data["openapi-token"] || null)
+    return await storage.get("openapi-token")
 }
 
 export const storeToken = async (token: string) => {
-    if (hasStorage) {
-        await chrome.storage.sync.set({ "openapi-token": token })
-    }
-    else if (typeof window !== "undefined") {
-        return window.localStorage.setItem("openapi-token", token)
-    }
+    await storage.set("openapi-token", token)
 }

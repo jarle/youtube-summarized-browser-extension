@@ -2,7 +2,7 @@ import { assign, createMachine } from "xstate";
 import { getToken } from "../common/tokenHandler";
 import { UserInfoRequestMessage, UserInfoResponseMessage } from "../messaging/userInfoPort";
 import { userInfoPort } from "../popup/messaging";
-import { UserInfo } from './../types';
+import { UserInfo } from '../types';
 
 export const getTokenService = async () => {
     const openAIToken = await getToken()

@@ -1,5 +1,5 @@
-import { FC } from "react"
-import logo from '../assets/outline-logo.svg'
+import logo from 'data-base64:~assets/outline-logo.svg'
+import type { FC } from "react"
 
 type props = {
     onClick: () => void

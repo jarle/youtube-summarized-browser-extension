@@ -1,4 +1,4 @@
-import { ErrorResponseMessage } from './../types';
+import type { ErrorResponseMessage } from '../types';
 
 export const SummaryPort = {
     name: "summaries",
