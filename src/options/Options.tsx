@@ -3,6 +3,7 @@ import { Button, Center, Container, FormControl, FormErrorMessage, FormHelperTex
 import logo from "data-base64:~assets/icon.png"
 import { useEffect, useState } from 'react'
 import { getToken, storeToken } from '../common/tokenHandler'
+import { Login } from './AuthComponent'
 
 function Options() {
   const [openAIToken, setOpenAIToken] = useState<string>()
@@ -83,6 +84,10 @@ function Options() {
           <Text>
             Need help? Check out the step by step guide <Link href="https://youtubesummarized.com/doc/chrome-extension-guide" fontWeight={'bold'} target="_blank">here.</Link>
           </Text>
+
+          <Login />
+
+
         </VStack>
       </Container>
     </main>

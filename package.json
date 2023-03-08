@@ -16,6 +16,7 @@
     "@emotion/react": "^11.10.6",
     "@emotion/styled": "^11.10.6",
     "@plasmohq/storage": "^1.2.2",
+    "@supabase/supabase-js": "^2.10.0",
     "@xstate/react": "^3.2.1",
     "chakra-ui-markdown-renderer": "^4.1.0",
     "framer-motion": "^10.2.3",
@@ -36,6 +37,7 @@
     "typescript": "4.9.4"
   },
   "manifest": {
+    "key": "$CRX_KEY",
     "host_permissions": [
       "*://api.youtubesummarized.com/*",
       "*://youtube.com/*",
@@ -43,6 +45,19 @@
     ],
     "permissions": [
       "storage"
+    ],
+    "web_accessible_resources": [
+      {
+        "resources": [
+          "options.html"
+        ],
+        "matches": [
+          "<all_urls>"
+        ],
+        "extension_ids": [
+          "$CRX_ID"
+        ]
+      }
     ]
   }
 }
