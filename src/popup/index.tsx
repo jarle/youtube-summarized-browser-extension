@@ -1,12 +1,11 @@
 import { ChakraProvider } from '@chakra-ui/react'
 import React from 'react'
-import ReactDOM from 'react-dom/client'
 import { SummaryContext, UserInfoContext } from '../common/state'
 import { ytSummarizedTheme } from '../theme'
 import { Popup } from './components/Popup'
 
 
-function App() {
+export default function App() {
   return (
     <React.StrictMode>
       <SummaryContext.Provider>
@@ -19,7 +18,3 @@ function App() {
     </React.StrictMode>
   )
 }
-
-const rootElement = document.getElementById('app') as HTMLElement
-const root = ReactDOM.createRoot(rootElement)
-root.render(<App />)

@@ -1,6 +1,6 @@
 import { getToken } from "../common/tokenHandler"
-import { UserInfoRequestMessage, UserInfoResponseMessage } from "../messaging/userInfoPort"
-import { ErrorResponseMessage } from "../types"
+import type { UserInfoRequestMessage, UserInfoResponseMessage } from "../messaging/userInfoPort"
+import type { ErrorResponseMessage } from "../types"
 import { getUserInfo } from "./fetchers"
 
 export const userInfoRequestHandler = async (message: UserInfoRequestMessage, port: chrome.runtime.Port) => {

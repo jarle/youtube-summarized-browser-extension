@@ -1,4 +1,4 @@
-import { ErrorResponseMessage, UserInfo } from "../types"
+import type { ErrorResponseMessage, UserInfo } from "../types"
 
 export const UserInfoPort = {
     name: "userInfo"

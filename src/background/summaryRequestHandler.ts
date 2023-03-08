@@ -1,6 +1,6 @@
 import { getToken } from "../common/tokenHandler"
-import { SummaryRequestMessage, SummaryResponseMessage } from "../messaging/summaryPort"
-import { ErrorResponseMessage } from "../types"
+import type { SummaryRequestMessage, SummaryResponseMessage } from "../messaging/summaryPort"
+import type { ErrorResponseMessage } from "../types"
 import { getSummary } from "./fetchers"
 
 export const summaryRequestHandler = async (message: SummaryRequestMessage, port: chrome.runtime.Port) => {

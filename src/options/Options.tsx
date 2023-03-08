@@ -1,9 +1,10 @@
 import { CheckIcon, ExternalLinkIcon, QuestionIcon } from '@chakra-ui/icons'
-import { Button, Container, FormControl, FormErrorMessage, FormHelperText, FormLabel, Heading, HStack, Image, Input, InputGroup, InputRightElement, Link, Text, Tooltip, VStack } from '@chakra-ui/react'
+import { Button, Center, Container, FormControl, FormErrorMessage, FormHelperText, FormLabel, Heading, HStack, Image, Input, InputGroup, InputRightElement, Link, Text, Tooltip, VStack } from '@chakra-ui/react'
+import logo from "data-base64:~assets/icon.png"
 import { useEffect, useState } from 'react'
 import { getToken, storeToken } from '../common/tokenHandler'
 
-function App() {
+function Options() {
   const [openAIToken, setOpenAIToken] = useState<string>()
   useEffect(() => {
     getToken()
@@ -19,14 +20,15 @@ function App() {
   return (
     <main>
       <Container>
-        <VStack padding={'2em'} spacing={10}>
-          <HStack>
-            <a href="https://youtubesummarized.com" target={"_blank"}>
-              <Image src="/img/xxhdpi.png" w={'48px'} />
-
-              <Heading>YouTube Summarized</Heading>
-            </a>
-          </HStack>
+        <VStack padding={'5em'} spacing={10}>
+          <Center>
+            <Link href="https://youtubesummarized.com" target={"_blank"}>
+              <HStack spacing={4}>
+                <Image src={logo} w={'48px'} />
+                <Heading w={'12em'}>YouTube Summarized</Heading>
+              </HStack>
+            </Link>
+          </Center>
           <VStack>
 
             <FormControl isInvalid={invalidAPIKey}>
@@ -87,4 +89,4 @@ function App() {
   )
 }
 
-export default App
+export default Options
