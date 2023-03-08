@@ -5,7 +5,7 @@ A chrome extension for generating YouTube summaries in note form using OpenAI.
 > The Extension is available for free on the [Chrome Web Store](https://chrome.google.com/webstore/detail/youtube-summarized/nkndldfehcidpejfkokbeghpnlbppdmo).
 
 <a href="https://youtubesummarized.com">
-<img src="img/logo.svg" alt="alt text" width="100%" height="128">
+<img src="assets/icon.svg" alt="alt text" width="100%" height="128">
 </a>
 
 ---
